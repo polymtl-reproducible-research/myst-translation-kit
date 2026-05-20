@@ -1,0 +1,15 @@
+# Translation kit configuration.
+# Edit this once per target project. All scripts and the JS widget read these values.
+
+# Language of your source files (.md / .ipynb). Site lives at /
+source_lang: en
+
+# Language to translate INTO. Translated site lives at /<target_lang>/
+target_lang: fr
+
+# Which language the widget defaults to on first visit (must be one of source_lang or target_lang)
+default_lang: fr
+
+# Short labels shown in the widget tooltip / aria. Purely cosmetic.
+source_label: EN
+target_label: FR
