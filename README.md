@@ -105,7 +105,15 @@ La console Google Cloud est immense : chaque étape ci-dessous donne donc un lie
    - Les budgets appartiennent au compte de facturation, pas au projet. Ouvrez <https://console.cloud.google.com/billing/budgets> ; si on vous le demande, choisissez le compte de facturation associé à l'étape 1.2.
    - Cliquez sur **+ Créer un budget** en haut de la page.
    - *1 Définir* : gardez **Alertes uniquement** sélectionné et donnez-lui un *Nom* (p. ex. `traduction`). (Le *plafonnement des dépenses* ne fonctionne que pour certains services ; pour une vraie limite stricte, utilisez le plafond de quota à la fin de cette étape.) Cliquez sur **Suivant**.
-   - *2 Champ d'application* : dans la liste **Projets**, sélectionnez seulement votre nouveau projet, pour ne pas compter les dépenses des autres. Cliquez sur **Suivant**.
+   - *2 Champ d'application* :
+     - **Période** : laissez **Mensuelle** (le quota gratuit se renouvelle aussi chaque mois).
+     - **Lecture seule pour les utilisateurs du projet** : laissez décoché.
+     - **Projets** : sélectionnez seulement votre nouveau projet, pour ne pas compter les dépenses des autres.
+     - **Services** : laissez **Tous les services**. Le projet ne sert qu'à la traduction : toute autre dépense mérite aussi une alerte.
+     - **Libellés** : laissez vide.
+     - **Économies** : gardez les valeurs par défaut. Le budget suit alors ce que vous payez réellement après les crédits de Google : l'alerte se déclenche quand de l'argent réel commence à sortir, pas tant que le quota gratuit couvre l'usage.
+
+     Cliquez sur **Suivant**.
    - *3 Montant* : choisissez *Montant spécifié* et entrez une petite somme, p. ex. `5`. Cliquez sur **Suivant**.
    - *4 Actions* : gardez les seuils et les alertes par courriel par défaut. Cliquez sur **Terminer**.
    - Une alerte n'arrête pas les dépenses : elle vous prévient. Pour un plafond strict, ouvrez plutôt `https://console.cloud.google.com/apis/api/translate.googleapis.com/quotas?project=YOUR_PROJECT_ID`, tapez `per day` dans le champ *Filtre* au-dessus du tableau, cochez la ligne des caractères par jour, cliquez sur **Modifier** (icône crayon) et entrez une limite plus basse.
@@ -353,7 +361,15 @@ The Google Cloud console is huge, so each step below gives a direct link and say
    - Budgets belong to the billing account, not the project. Open <https://console.cloud.google.com/billing/budgets>; if it asks, choose the billing account you linked in step 1.2.
    - Click **+ Create budget** at the top of the page.
    - *1 Define*: keep **Alerts only** selected, and give it a *Name* (e.g. `translation`). (*Spend cap enforcement* only works for some services; for a dependable hard limit, use the quota cap at the end of this step.) Click **Next**.
-   - *2 Scope*: in the **Projects** dropdown, select only your new project, so spending in other projects isn't counted. Click **Next**.
+   - *2 Scope*:
+     - **Time range**: leave **Monthly** (the free allowance resets monthly too).
+     - **Read-only for project users**: leave unticked.
+     - **Projects**: select only your new project, so spending in other projects isn't counted.
+     - **Services**: leave **All services**. The project exists only for translation, so anything else showing up there deserves an alert too.
+     - **Labels**: leave empty.
+     - **Savings**: leave the defaults. The budget then tracks what you actually pay after Google's credits, so the alert fires when real money starts going out, not while the free allowance covers it.
+
+     Click **Next**.
    - *3 Amount*: choose *Specified amount* and enter something small, e.g. `5`. Click **Next**.
    - *4 Actions*: keep the default thresholds and email alerts. Click **Finish**.
    - An alert doesn't stop spending; it tells you. For a hard cap instead, open `https://console.cloud.google.com/apis/api/translate.googleapis.com/quotas?project=YOUR_PROJECT_ID`, type `per day` in the *Filter* box above the table, tick the characters-per-day row, click **Edit** (pencil icon), and enter a lower limit.
