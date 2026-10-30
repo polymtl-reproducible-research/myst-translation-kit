@@ -85,15 +85,15 @@ Faites les étapes dans l'ordre : le premier push sur `main` déclenche un dépl
    - **Restrictions d'API** : sélectionnez seulement « Cloud Translation API ». Une clé qui fuit ne pourra alors servir qu'à traduire. (Si elle n'apparaît pas dans la liste, l'API n'est pas activée dans ce projet : refaites l'étape 3.)
    - **Restrictions d'application** : laissez *Aucune*. La clé est utilisée par les serveurs de GitHub Actions, dont les adresses IP changent à chaque exécution, et une restriction par site web ne s'applique qu'aux requêtes faites depuis un navigateur.
 
-   Cliquez sur *Créer*, puis copiez la clé affichée.
+   Cliquez sur *Créer*. Inutile de copier la clé maintenant : la page *Identifiants* la réaffiche à tout moment avec *Afficher la clé*, et chaque étape qui en a besoin vous dira de la copier juste avant de la coller.
 5. **Alerte budgétaire** (recommandé) : *Facturation → Budgets et alertes*, créez un petit budget (p. ex. 5 $) avec alertes par courriel. Une alerte n'arrête pas les dépenses : elle vous prévient. Pour un plafond strict, réduisez le quota de caractères par jour de l'API dans *API et services → Cloud Translation API → Quotas*.
 
-**Où va la clé :** à un seul endroit, le secret GitHub de l'étape 5. Inutile de la sauvegarder ailleurs : la page *Identifiants* la réaffiche avec *Afficher la clé*. Ne la mettez jamais dans un fichier du dépôt (une clé commitée reste dans l'historique git même après suppression : considérez-la comme compromise et supprimez-la), ni dans une issue, une pull request ou un message, ni en clair sur une ligne de commande (elle resterait dans l'historique du shell).
+**Où va la clé :** à un seul endroit, le secret GitHub de l'étape 5. Ne la sauvegardez nulle part ailleurs. Ne la mettez jamais dans un fichier du dépôt (une clé commitée reste dans l'historique git même après suppression : considérez-la comme compromise et supprimez-la), ni dans une issue, une pull request ou un message, ni en clair sur une ligne de commande (elle resterait dans l'historique du shell).
 
-Vérifiez que la clé fonctionne. `read` la demande sans l'afficher ni l'enregistrer dans l'historique :
+Vérifiez que la clé fonctionne. Lancez la première ligne ; quand elle attend, allez dans *Identifiants*, cliquez sur *Afficher la clé*, copiez-la et collez-la aussitôt dans le terminal (rien ne s'affiche, c'est normal), puis Entrée. `read` ne l'enregistre pas dans l'historique :
 
 ```bash
-read -rs GOOGLE_TRANSLATE_API_KEY && export GOOGLE_TRANSLATE_API_KEY   # collez la clé, puis Entrée
+read -rs GOOGLE_TRANSLATE_API_KEY && export GOOGLE_TRANSLATE_API_KEY
 curl -s "https://translation.googleapis.com/language/translate/v2" \
   -d key="$GOOGLE_TRANSLATE_API_KEY" -d q="Hello world" -d source=en -d target=fr
 ```
@@ -144,7 +144,7 @@ Dans *Settings* du dépôt :
 1. **Pages** : *Pages → Build and deployment → Source* : choisissez **GitHub Actions**.
 2. **La clé** : *Environments → New environment*, nommé exactement **`translation`**.
    - Sous *Deployment branches and tags*, choisissez *Selected branches and tags* et ajoutez `main`. Ainsi, seul du code déjà fusionné peut lire la clé.
-   - Sous *Environment secrets*, ajoutez **`GOOGLE_TRANSLATE_API_KEY`** avec la clé de l'étape 1.
+   - Sous *Environment secrets*, cliquez sur *Add environment secret* et nommez-le **`GOOGLE_TRANSLATE_API_KEY`**. Pour la valeur : dans la console Google Cloud, *API et services → Identifiants*, cliquez sur *Afficher la clé*, copiez-la, et collez-la aussitôt dans le champ *Value*. Enregistrez.
 3. **Protéger `main`** : *Rules → Rulesets → New branch ruleset*, ciblez la branche par défaut, et activez :
    - *Require a pull request before merging*, avec *Require review from Code Owners* (sans cela, `CODEOWNERS` n'empêche rien) ;
    - *Require status checks to pass*, avec la vérification **`Translation budget`** (elle apparaît après la première pull request) ;
@@ -298,15 +298,15 @@ Do these steps in order: the first push to `main` triggers a deploy, which will 
    - **API restrictions**: select only "Cloud Translation API". A leaked key can then only be used to translate. (If it isn't in the list, the API isn't enabled in this project: redo step 3.)
    - **Application restrictions**: leave *None*. The key is used by GitHub Actions servers, whose IP addresses change on every run, and a website restriction only applies to requests made from a browser.
 
-   Click *Create*, then copy the key it shows.
+   Click *Create*. No need to copy the key now: the *Credentials* page shows it again any time with *Show key*, and each step that needs it will tell you to copy it right before you paste it.
 5. **Budget alert** (recommended): *Billing → Budgets & alerts*, create a small budget (e.g. $5) with email alerts. An alert doesn't stop spending; it tells you. For a hard cap, lower the API's characters-per-day quota under *APIs & Services → Cloud Translation API → Quotas*.
 
-**Where the key goes:** one place only, the GitHub secret in step 5. No need to save it anywhere else: the *Credentials* page shows it again with *Show key*. Never put it in a file in the repository (a committed key stays in git history even after it's deleted: treat it as leaked and delete the key), in an issue, pull request or message, or typed out on a command line (it would stay in your shell history).
+**Where the key goes:** one place only, the GitHub secret in step 5. Don't save it anywhere else. Never put it in a file in the repository (a committed key stays in git history even after it's deleted: treat it as leaked and delete the key), in an issue, pull request or message, or typed out on a command line (it would stay in your shell history).
 
-Check that the key works. `read` asks for it without displaying it or saving it to your history:
+Check that the key works. Run the first line; while it waits, go to *Credentials*, click *Show key*, copy it and paste it straight into the terminal (nothing appears, that's normal), then press Enter. `read` keeps it out of your shell history:
 
 ```bash
-read -rs GOOGLE_TRANSLATE_API_KEY && export GOOGLE_TRANSLATE_API_KEY   # paste the key, then Enter
+read -rs GOOGLE_TRANSLATE_API_KEY && export GOOGLE_TRANSLATE_API_KEY
 curl -s "https://translation.googleapis.com/language/translate/v2" \
   -d key="$GOOGLE_TRANSLATE_API_KEY" -d q="Hello world" -d source=en -d target=fr
 ```
@@ -357,7 +357,7 @@ In the repository's *Settings*:
 1. **Pages**: *Pages → Build and deployment → Source*: choose **GitHub Actions**.
 2. **The key**: *Environments → New environment*, named exactly **`translation`**.
    - Under *Deployment branches and tags*, choose *Selected branches and tags* and add `main`. That way only merged code can read the key.
-   - Under *Environment secrets*, add **`GOOGLE_TRANSLATE_API_KEY`** with the key from step 1.
+   - Under *Environment secrets*, click *Add environment secret* and name it **`GOOGLE_TRANSLATE_API_KEY`**. For the value: in the Google Cloud console, *APIs & Services → Credentials*, click *Show key*, copy it, and paste it straight into the *Value* field. Save.
 3. **Protect `main`**: *Rules → Rulesets → New branch ruleset*, target the default branch, and turn on:
    - *Require a pull request before merging*, with *Require review from Code Owners* (without it, `CODEOWNERS` blocks nothing);
    - *Require status checks to pass*, with the **`Translation budget`** check (it appears after the first pull request);
