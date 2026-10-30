@@ -315,7 +315,7 @@ Ne recopiez pas `translations/fr.overrides.json` (vos traductions épinglées) n
 
 ### Licence
 
-[MIT](LICENSE). Vous pouvez utiliser, modifier et redistribuer la trousse, y compris dans vos propres gabarits, en conservant l'avis de licence.
+[MIT](LICENSE) ([traduction française non officielle](docs/LICENCE.fr.md) ; seule la version anglaise fait foi). Vous pouvez utiliser, modifier et redistribuer la trousse, y compris dans vos propres gabarits, en conservant l'avis de licence.
 
 ---
 
@@ -624,4 +624,4 @@ Don't re-copy `translations/fr.overrides.json` (your pinned translations) or `.g
 
 ### License
 
-[MIT](LICENSE). You may use, modify and redistribute the kit, including in your own templates, as long as the license notice is kept.
+[MIT](LICENSE) ([unofficial French translation](docs/LICENCE.fr.md); only the English version is binding). You may use, modify and redistribute the kit, including in your own templates, as long as the license notice is kept.
