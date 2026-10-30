@@ -177,13 +177,15 @@ Le `.` final compte : il copie le contenu du modèle, y compris le dossier cach�
 
 Attention : cela remplace `.github/workflows/deploy.yml`, `.github/workflows/tests.yml` et `.github/CODEOWNERS` s'ils existent déjà. Si vous aviez votre propre workflow de déploiement, fusionnez-le avec celui de la trousse plutôt que de l'écraser.
 
-Ajoutez à votre `.gitignore` :
+Ensuite, toujours dans le dossier de votre livre, dites à git d'ignorer les dossiers générés par le build. Un livre créé avec `myst init` n'a pas encore de `.gitignore` ; cette commande le crée, ou le complète s'il existe :
 
-```
+```bash
+cat >> .gitignore <<'EOF'
 _build/
 _translated/
 .tcache/
 __pycache__/
+EOF
 ```
 
 #### 3. Adapter deux fichiers
@@ -470,13 +472,15 @@ The `.` at the end matters: it copies the template's contents, including the hid
 
 Careful: this replaces `.github/workflows/deploy.yml`, `.github/workflows/tests.yml` and `.github/CODEOWNERS` if they already exist. If you had your own deploy workflow, merge it with the kit's rather than overwriting it.
 
-Add to your `.gitignore`:
+Then, still in your book's folder, make git ignore the folders the build generates. A book made with `myst init` has no `.gitignore` yet; this command creates it, or adds to it if it exists:
 
-```
+```bash
+cat >> .gitignore <<'EOF'
 _build/
 _translated/
 .tcache/
 __pycache__/
+EOF
 ```
 
 #### 3. Adapt two files
