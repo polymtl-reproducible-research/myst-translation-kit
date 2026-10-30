@@ -145,7 +145,8 @@ La console Google Cloud est immense : chaque étape ci-dessous donne donc un lie
      "data": {
        "translations": [
          {
-           "translatedText": "Bonjour le monde"
+           "translatedText": "Bonjour le monde",
+           "detectedSourceLanguage": "en"
          }
        ]
      }
@@ -425,7 +426,8 @@ The Google Cloud console is huge, so each step below gives a direct link and say
      "data": {
        "translations": [
          {
-           "translatedText": "Bonjour le monde"
+           "translatedText": "Bonjour le monde",
+           "detectedSourceLanguage": "en"
          }
        ]
      }
