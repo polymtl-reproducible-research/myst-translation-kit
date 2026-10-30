@@ -122,15 +122,15 @@ La console Google Cloud est immense : chaque étape ci-dessous donne donc un lie
 
 **Vérifiez que la clé fonctionne** (une minute, et ça évite de déboguer un déploiement raté plus tard) :
 
-1. Ouvrez `https://console.cloud.google.com/apis/credentials?project=YOUR_PROJECT_ID`, cliquez sur **Afficher la clé** dans la ligne de votre clé, et copiez la clé.
-2. Dans un terminal, lancez :
+1. Dans un terminal, lancez :
 
    ```bash
    read -rs GOOGLE_TRANSLATE_API_KEY && export GOOGLE_TRANSLATE_API_KEY
    ```
 
-   Le terminal attend maintenant une saisie.
-3. Collez la clé et appuyez sur Entrée. Rien ne s'affiche pendant le collage : c'est normal, et ça garde aussi la clé hors de l'historique du shell.
+   Le terminal attend maintenant une saisie. Laissez-le attendre.
+2. Seulement maintenant, copiez la clé (copiée plus tôt, elle aurait été écrasée quand vous avez copié la commande ci-dessus) : ouvrez `https://console.cloud.google.com/apis/credentials?project=YOUR_PROJECT_ID`, cliquez sur **Afficher la clé** dans la ligne de votre clé, et copiez la clé.
+3. De retour dans le terminal qui attend, collez la clé et appuyez sur Entrée. Rien ne s'affiche pendant le collage : c'est normal, et ça garde aussi la clé hors de l'historique du shell.
 4. Lancez :
 
    ```bash
@@ -402,15 +402,15 @@ The Google Cloud console is huge, so each step below gives a direct link and say
 
 **Check that the key works** (one minute, and it saves debugging a failed deploy later):
 
-1. Open `https://console.cloud.google.com/apis/credentials?project=YOUR_PROJECT_ID`, click **Show key** in your key's row, and copy the key.
-2. In a terminal, run:
+1. In a terminal, run:
 
    ```bash
    read -rs GOOGLE_TRANSLATE_API_KEY && export GOOGLE_TRANSLATE_API_KEY
    ```
 
-   The terminal now waits for input.
-3. Paste the key and press Enter. Nothing appears on screen while you paste: that's normal, and it also keeps the key out of your shell history.
+   The terminal now waits for input. Leave it waiting.
+2. Only now copy the key (copying it earlier would have been overwritten when you copied the command above): open `https://console.cloud.google.com/apis/credentials?project=YOUR_PROJECT_ID`, click **Show key** in your key's row, and copy the key.
+3. Back in the waiting terminal, paste the key and press Enter. Nothing appears on screen while you paste: that's normal, and it also keeps the key out of your shell history.
 4. Run:
 
    ```bash
