@@ -120,15 +120,39 @@ La console Google Cloud est immense : chaque étape ci-dessous donne donc un lie
 
 **Où va la clé :** à un seul endroit, le secret GitHub de l'étape 5.2. Ne la sauvegardez nulle part ailleurs. Ne la mettez jamais dans un fichier du dépôt (une clé commitée reste dans l'historique git même après suppression : considérez-la comme compromise et supprimez-la), ni dans une issue, une pull request ou un message, ni en clair sur une ligne de commande (elle resterait dans l'historique du shell).
 
-**Vérifiez que la clé fonctionne.** Lancez la première ligne ci-dessous ; pendant qu'elle attend, ouvrez `https://console.cloud.google.com/apis/credentials?project=YOUR_PROJECT_ID`, cliquez sur **Afficher la clé** dans la ligne de votre clé, copiez-la et collez-la aussitôt dans le terminal (rien ne s'affiche, c'est normal), puis Entrée. `read` ne l'enregistre pas dans l'historique. Lancez ensuite le `curl` :
+**Vérifiez que la clé fonctionne** (une minute, et ça évite de déboguer un déploiement raté plus tard) :
 
-```bash
-read -rs GOOGLE_TRANSLATE_API_KEY && export GOOGLE_TRANSLATE_API_KEY
-curl -s "https://translation.googleapis.com/language/translate/v2" \
-  -d key="$GOOGLE_TRANSLATE_API_KEY" -d q="Hello world" -d source=en -d target=fr
-```
+1. Ouvrez `https://console.cloud.google.com/apis/credentials?project=YOUR_PROJECT_ID`, cliquez sur **Afficher la clé** dans la ligne de votre clé, et copiez la clé.
+2. Dans un terminal, lancez :
 
-La réponse doit contenir `"translatedText": "Bonjour le monde"`. La variable disparaît à la fermeture du terminal.
+   ```bash
+   read -rs GOOGLE_TRANSLATE_API_KEY && export GOOGLE_TRANSLATE_API_KEY
+   ```
+
+   Le terminal attend maintenant une saisie.
+3. Collez la clé et appuyez sur Entrée. Rien ne s'affiche pendant le collage : c'est normal, et ça garde aussi la clé hors de l'historique du shell.
+4. Lancez :
+
+   ```bash
+   curl -s "https://translation.googleapis.com/language/translate/v2" \
+     -d key="$GOOGLE_TRANSLATE_API_KEY" -d q="Hello world" -d source=en -d target=fr
+   ```
+
+5. Si la clé fonctionne, vous voyez :
+
+   ```json
+   {
+     "data": {
+       "translations": [
+         {
+           "translatedText": "Bonjour le monde"
+         }
+       ]
+     }
+   }
+   ```
+
+   Si vous voyez plutôt `"error"`, son `"message"` dit ce qui ne va pas ; voir *Dépannage*. La clé est oubliée à la fermeture du terminal.
 
 #### 2. Copier la trousse dans votre livre
 
@@ -376,15 +400,39 @@ The Google Cloud console is huge, so each step below gives a direct link and say
 
 **Where the key goes:** one place only, the GitHub secret in step 5.2. Don't save it anywhere else. Never put it in a file in the repository (a committed key stays in git history even after it's deleted: treat it as leaked and delete the key), in an issue, pull request or message, or typed out on a command line (it would stay in your shell history).
 
-**Check that the key works.** Run the first line below; while it waits, open `https://console.cloud.google.com/apis/credentials?project=YOUR_PROJECT_ID`, click **Show key** in your key's row, copy it and paste it straight into the terminal (nothing appears, that's normal), then press Enter. `read` keeps it out of your shell history. Then run the `curl`:
+**Check that the key works** (one minute, and it saves debugging a failed deploy later):
 
-```bash
-read -rs GOOGLE_TRANSLATE_API_KEY && export GOOGLE_TRANSLATE_API_KEY
-curl -s "https://translation.googleapis.com/language/translate/v2" \
-  -d key="$GOOGLE_TRANSLATE_API_KEY" -d q="Hello world" -d source=en -d target=fr
-```
+1. Open `https://console.cloud.google.com/apis/credentials?project=YOUR_PROJECT_ID`, click **Show key** in your key's row, and copy the key.
+2. In a terminal, run:
 
-The response should contain `"translatedText": "Bonjour le monde"`. The variable goes away when you close the terminal.
+   ```bash
+   read -rs GOOGLE_TRANSLATE_API_KEY && export GOOGLE_TRANSLATE_API_KEY
+   ```
+
+   The terminal now waits for input.
+3. Paste the key and press Enter. Nothing appears on screen while you paste: that's normal, and it also keeps the key out of your shell history.
+4. Run:
+
+   ```bash
+   curl -s "https://translation.googleapis.com/language/translate/v2" \
+     -d key="$GOOGLE_TRANSLATE_API_KEY" -d q="Hello world" -d source=en -d target=fr
+   ```
+
+5. If the key works, you see:
+
+   ```json
+   {
+     "data": {
+       "translations": [
+         {
+           "translatedText": "Bonjour le monde"
+         }
+       ]
+     }
+   }
+   ```
+
+   If you see `"error"` instead, its `"message"` says what's wrong; see *Troubleshooting*. The key is forgotten when you close the terminal.
 
 #### 2. Copy the kit into your book
 
