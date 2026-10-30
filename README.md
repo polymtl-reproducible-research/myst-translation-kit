@@ -68,33 +68,51 @@ Faites les étapes dans l'ordre : le premier push sur `main` déclenche un dépl
 
 #### 1. Obtenir une clé d'API Google Cloud Translation
 
+La console Google Cloud est immense : chaque étape ci-dessous donne donc un lien direct et dit sur quoi cliquer dans la page. Dans les liens qui contiennent `YOUR_PROJECT_ID`, remplacez-le par l'identifiant de votre projet (obtenu à l'étape 1.1) : le lien s'ouvre alors directement dans le bon projet, quel que soit celui que la console affichait.
+
 **Première fois sur Google Cloud ?** Quelques étapes uniques :
 
 - Connectez-vous avec un compte Google. Un compte institutionnel peut avoir Google Cloud désactivé ou restreint par son administrateur ; un compte Gmail personnel est le plus simple.
 - À la première visite de la console, acceptez les conditions d'utilisation et choisissez votre pays.
-- La première fois que vous configurez la facturation, Google propose généralement un essai gratuit (un crédit à utiliser dans un délai limité). Une carte de crédit est demandée pour vérifier votre identité ; rien n'est facturé pendant l'essai.
-- **Important :** à la fin de l'essai, Google suspend les services payants tant que vous n'avez pas activé un compte complet, et le déploiement se met à échouer avec une erreur de facturation. Activez le compte complet (bouton *Activer* ou *Passer à un compte complet* dans *Facturation*) dès que le livre est en ligne. Les 500 000 caractères gratuits par mois s'appliquent toujours ensuite.
+- La première fois que vous configurez la facturation (étape 1.2), Google propose généralement un essai gratuit (un crédit à utiliser dans un délai limité). Une carte de crédit est demandée pour vérifier votre identité ; rien n'est facturé pendant l'essai.
+- **Important :** à la fin de l'essai, Google suspend les services payants tant que vous n'avez pas activé un compte complet, et le déploiement se met à échouer avec une erreur de facturation. Une fois le livre en ligne, ouvrez <https://console.cloud.google.com/billing>, cliquez sur votre compte de facturation, puis sur sa page *Présentation*, cliquez sur **Activer** (ou **Passer à un compte complet**) dans la bannière en haut. Les 500 000 caractères gratuits par mois s'appliquent toujours ensuite.
 
-1. **Créer un projet** : ouvrez <https://console.cloud.google.com/projectcreate>, nommez-le (p. ex. `mon-livre-traduction`) et cliquez sur *Créer*. Si la console vous ouvre plutôt un projet existant, c'est normal : le menu des projets est le nom de projet en haut à gauche, à côté du logo Google Cloud. Utilisez un projet dédié.
+1. **Créer un projet**
+   - Ouvrez <https://console.cloud.google.com/projectcreate>.
+   - *Nom du projet* : p. ex. `mon-livre-traduction`. Juste sous le nom, Google affiche l'**ID du projet** qu'il utilisera (p. ex. `mon-livre-traduction-471203`). Notez-le : c'est `YOUR_PROJECT_ID` dans tous les liens ci-dessous.
+   - Cliquez sur **Créer**.
+   - Créer un projet ne fait **pas** basculer la console dessus. Ne naviguez pas avec les menus ; utilisez les liens ci-dessous, qui ouvrent directement votre nouveau projet.
+   - ID perdu ? Cliquez sur le nom du projet en haut à gauche de la console, à côté du logo Google Cloud : la fenêtre liste tous vos projets avec leur ID.
 
-   **Créer le projet ne vous y amène pas** : la console reste sur le projet précédent. Une fois le projet créé, cliquez sur *Sélectionner le projet* dans la notification, ou choisissez-le dans le menu des projets. Pendant toutes les étapes suivantes, vérifiez que l'URL contient `?project=<id-de-votre-nouveau-projet>` : sinon, la facturation, l'API et la clé atterriront dans le mauvais projet.
-2. **Facturation** : dans le menu *Facturation*, associez un compte de facturation au projet. L'API refuse toute requête sans facturation, même à l'intérieur du quota gratuit.
-3. **Activer l'API** : *API et services → Bibliothèque*, cherchez « Cloud Translation API », puis *Activer*.
-4. **Créer la clé** : *API et services → Identifiants → Créer des identifiants → Clé API*. (Ignorez le rappel « configure the OAuth consent screen » : il ne concerne que les applications qui connectent des utilisateurs, pas les clés d'API.) Un formulaire s'ouvre :
-   - **Nom** : quelque chose de reconnaissable, p. ex. `mon-livre-traduction`.
-   - **Restrictions d'API** : sélectionnez seulement « Cloud Translation API ». Une clé qui fuit ne pourra alors servir qu'à traduire. (Si elle n'apparaît pas dans la liste, l'API n'est pas activée dans ce projet : refaites l'étape 3.)
-   - **Restrictions d'application** : laissez *Aucune*. La clé est utilisée par les serveurs de GitHub Actions, dont les adresses IP changent à chaque exécution, et une restriction par site web ne s'applique qu'aux requêtes faites depuis un navigateur.
+2. **Associer la facturation**
+   - Ouvrez `https://console.cloud.google.com/billing/linkedaccount?project=YOUR_PROJECT_ID`.
+   - Si la page indique que le projet n'a pas de compte de facturation, cliquez sur **Associer un compte de facturation** et choisissez le vôtre. Si vous n'en avez pas encore, choisissez **Créer un compte de facturation** et suivez l'inscription (pays, carte).
+   - Sans facturation, l'API refuse toute requête, même à l'intérieur du quota gratuit.
 
-   Cliquez sur *Créer*. Inutile de copier la clé maintenant : la page *Identifiants* la réaffiche à tout moment avec *Afficher la clé*, et chaque étape qui en a besoin vous dira de la copier juste avant de la coller.
-5. **Alerte budgétaire** (recommandé) : les budgets appartiennent au compte de facturation, pas au projet, donc ils ne sont pas dans *API et services*. Ouvrez <https://console.cloud.google.com/billing/budgets> (ou tapez « Budgets » dans la barre de recherche de la console), choisissez votre compte de facturation, puis *Créer un budget* :
-   - **Champ d'application → Projets** : seulement votre nouveau projet, pour ne pas compter les dépenses de vos autres projets ;
-   - **Montant** : petit, p. ex. 5 $ ; gardez les alertes par courriel par défaut.
+3. **Activer l'API**
+   - Ouvrez `https://console.cloud.google.com/apis/library/translate.googleapis.com?project=YOUR_PROJECT_ID`.
+   - Vérifiez que le nom de projet en haut de la page est bien votre nouveau projet, puis cliquez sur le bouton bleu **Activer**. Une fois terminé, la page devient la présentation de l'API, avec un bouton **Gérer** à la place d'*Activer*.
 
-   Une alerte n'arrête pas les dépenses : elle vous prévient. Pour un plafond strict, réduisez plutôt le quota de caractères par jour de l'API : <https://console.cloud.google.com/apis/api/translate.googleapis.com/quotas>.
+4. **Créer la clé**
+   - Ouvrez `https://console.cloud.google.com/apis/credentials?project=YOUR_PROJECT_ID`. Ignorez le rappel « configure the OAuth consent screen » : il concerne les applications qui connectent des utilisateurs, pas les clés d'API.
+   - En haut de la page, cliquez sur **+ Créer des identifiants**, puis sur **Clé API** dans le menu qui s'ouvre. Un formulaire s'affiche :
+     - **Nom** : quelque chose de reconnaissable, p. ex. `mon-livre-traduction`.
+     - **Restrictions d'API** : ouvrez la liste et cochez seulement **Cloud Translation API**. Une clé qui fuit ne pourra alors servir qu'à traduire. (Si elle n'apparaît pas, l'API n'est pas activée dans ce projet : refaites l'étape 1.3.)
+     - **Restrictions d'application** : laissez **Aucune**. La clé est utilisée par les serveurs de GitHub Actions, dont les adresses IP changent à chaque exécution, et une restriction par site web ne s'applique qu'aux requêtes faites depuis un navigateur.
+   - Cliquez sur **Créer**. Inutile de copier la clé maintenant : sur cette même page *Identifiants*, la ligne de votre clé dans le tableau *Clés API* a un lien **Afficher la clé** (colonne *Actions*) qui la réaffiche à tout moment. Chaque étape qui en a besoin vous dira d'aller la chercher là juste avant de la coller.
 
-**Où va la clé :** à un seul endroit, le secret GitHub de l'étape 5. Ne la sauvegardez nulle part ailleurs. Ne la mettez jamais dans un fichier du dépôt (une clé commitée reste dans l'historique git même après suppression : considérez-la comme compromise et supprimez-la), ni dans une issue, une pull request ou un message, ni en clair sur une ligne de commande (elle resterait dans l'historique du shell).
+5. **Alerte budgétaire** (recommandé)
+   - Les budgets appartiennent au compte de facturation, pas au projet. Ouvrez <https://console.cloud.google.com/billing/budgets> ; si on vous le demande, choisissez le compte de facturation associé à l'étape 1.2.
+   - Cliquez sur **+ Créer un budget** en haut de la page.
+   - *1 Définir* : gardez **Alertes uniquement** sélectionné et donnez-lui un *Nom* (p. ex. `traduction`). (Le *plafonnement des dépenses* ne fonctionne que pour certains services ; pour une vraie limite stricte, utilisez le plafond de quota à la fin de cette étape.) Cliquez sur **Suivant**.
+   - *2 Champ d'application* : dans la liste **Projets**, sélectionnez seulement votre nouveau projet, pour ne pas compter les dépenses des autres. Cliquez sur **Suivant**.
+   - *3 Montant* : choisissez *Montant spécifié* et entrez une petite somme, p. ex. `5`. Cliquez sur **Suivant**.
+   - *4 Actions* : gardez les seuils et les alertes par courriel par défaut. Cliquez sur **Terminer**.
+   - Une alerte n'arrête pas les dépenses : elle vous prévient. Pour un plafond strict, ouvrez plutôt `https://console.cloud.google.com/apis/api/translate.googleapis.com/quotas?project=YOUR_PROJECT_ID`, tapez `per day` dans le champ *Filtre* au-dessus du tableau, cochez la ligne des caractères par jour, cliquez sur **Modifier** (icône crayon) et entrez une limite plus basse.
 
-Vérifiez que la clé fonctionne. Lancez la première ligne ; quand elle attend, allez dans *Identifiants*, cliquez sur *Afficher la clé*, copiez-la et collez-la aussitôt dans le terminal (rien ne s'affiche, c'est normal), puis Entrée. `read` ne l'enregistre pas dans l'historique :
+**Où va la clé :** à un seul endroit, le secret GitHub de l'étape 5.2. Ne la sauvegardez nulle part ailleurs. Ne la mettez jamais dans un fichier du dépôt (une clé commitée reste dans l'historique git même après suppression : considérez-la comme compromise et supprimez-la), ni dans une issue, une pull request ou un message, ni en clair sur une ligne de commande (elle resterait dans l'historique du shell).
+
+**Vérifiez que la clé fonctionne.** Lancez la première ligne ci-dessous ; pendant qu'elle attend, ouvrez `https://console.cloud.google.com/apis/credentials?project=YOUR_PROJECT_ID`, cliquez sur **Afficher la clé** dans la ligne de votre clé, copiez-la et collez-la aussitôt dans le terminal (rien ne s'affiche, c'est normal), puis Entrée. `read` ne l'enregistre pas dans l'historique. Lancez ensuite le `curl` :
 
 ```bash
 read -rs GOOGLE_TRANSLATE_API_KEY && export GOOGLE_TRANSLATE_API_KEY
@@ -143,16 +161,17 @@ git switch main
 
 #### 5. Configurer le dépôt GitHub
 
-Dans *Settings* du dépôt :
+Dans les liens ci-dessous, remplacez `OWNER/REPO` par votre dépôt (p. ex. `jeanne/mon-livre`).
 
-1. **Pages** : *Pages → Build and deployment → Source* : choisissez **GitHub Actions**.
-2. **La clé** : *Environments → New environment*, nommé exactement **`translation`**.
-   - Sous *Deployment branches and tags*, choisissez *Selected branches and tags* et ajoutez `main`. Ainsi, seul du code déjà fusionné peut lire la clé.
-   - Sous *Environment secrets*, cliquez sur *Add environment secret* et nommez-le **`GOOGLE_TRANSLATE_API_KEY`**. Pour la valeur : dans la console Google Cloud, *API et services → Identifiants*, cliquez sur *Afficher la clé*, copiez-la, et collez-la aussitôt dans le champ *Value*. Enregistrez.
-3. **Protéger `main`** : *Rules → Rulesets → New branch ruleset*, ciblez la branche par défaut, et activez :
-   - *Require a pull request before merging*, avec *Require review from Code Owners* (sans cela, `CODEOWNERS` n'empêche rien) ;
-   - *Require status checks to pass*, avec la vérification **`Translation budget`** (elle apparaît après la première pull request) ;
-   - *Block force pushes*.
+1. **Pages**
+   - Ouvrez `https://github.com/OWNER/REPO/settings/pages`.
+   - Sous *Build and deployment*, ouvrez la liste **Source** et choisissez **GitHub Actions**. C'est appliqué immédiatement ; rien à enregistrer.
+
+2. **La clé**
+   - Ouvrez `https://github.com/OWNER/REPO/settings/environments/new`.
+   - *Name* : exactement **`translation`**. Cliquez sur **Configure environment** ; vous arrivez sur la page de réglages de l'environnement.
+   - *Deployment branches and tags* : ouvrez la liste (elle indique *No restriction*) et choisissez **Selected branches and tags**. Cliquez sur **Add deployment branch or tag rule**, tapez `main`, puis **Add rule**. Seul du code fusionné pourra lire la clé.
+   - *Environment secrets*, plus bas sur la même page : cliquez sur **Add environment secret**. *Name* : **`GOOGLE_TRANSLATE_API_KEY`**. Pour la *Value*, ouvrez `https://console.cloud.google.com/apis/credentials?project=YOUR_PROJECT_ID` dans un autre onglet, cliquez sur **Afficher la clé** dans la ligne de votre clé, copiez-la, revenez et collez-la aussitôt dans *Value*. Cliquez sur **Add secret**.
 
 #### 6. Commit et push
 
@@ -163,6 +182,18 @@ git push origin main
 ```
 
 Le premier déploiement traduit tout le livre (ce qui compte dans le quota gratuit), enregistre les traductions sur `translation-cache`, et publie le site à `https://<propriétaire>.github.io/<dépôt>/` et la version française à `.../<dépôt>/fr/`. Les déploiements suivants ne traduisent que le texte nouveau ou modifié.
+
+#### 7. Protéger `main`
+
+À faire après le premier push : désormais, les changements n'arrivent sur `main` que par des pull requests révisées.
+
+- Ouvrez `https://github.com/OWNER/REPO/settings/rules/new?target=branch`.
+- *Ruleset name* : `main`. *Enforcement status* : **Active**.
+- *Target branches* : cliquez sur **Add target**, puis **Include default branch**.
+- Sous *Branch rules*, laissez **Restrict deletions** et **Block force pushes** cochées, et cochez :
+  - **Require a pull request before merging**, puis, dans les options qui apparaissent dessous, **Require review from Code Owners**. Sans cela, `CODEOWNERS` n'empêche rien.
+  - **Require status checks to pass**, puis cliquez sur **+ Add checks**, tapez `Translation budget` et sélectionnez-la. La vérification n'apparaît qu'après avoir tourné sur une pull request : sur un dépôt tout neuf, ouvrez une première pull request, puis revenez dans ce ruleset pour l'ajouter.
+- Cliquez sur **Create** en bas de la page.
 
 ### Au quotidien
 
@@ -206,11 +237,11 @@ Si le cache couvre déjà toutes les phrases, aucune clé n'est nécessaire. Sin
 ### Dépannage
 
 - **`GOOGLE_TRANSLATE_API_KEY is not set`** : le secret manque, ou l'environnement ne s'appelle pas exactement `translation`.
-- **`Branch "…" is not allowed to deploy to translation`** : seul `main` peut lire la clé (étape 5). C'est voulu ; fusionnez d'abord la branche.
-- **Erreur 403 mentionnant la facturation ou une API désactivée** : la facturation n'est pas associée au projet, l'API Cloud Translation n'est pas activée (étape 1), ou l'essai gratuit est terminé sans que le compte complet ait été activé.
+- **`Branch "…" is not allowed to deploy to translation`** : seul `main` peut lire la clé (étape 5.2). C'est voulu ; fusionnez d'abord la branche.
+- **Erreur 403 mentionnant la facturation ou une API désactivée** : la facturation n'est pas associée au projet, l'API Cloud Translation n'est pas activée (étapes 1.2 et 1.3), ou l'essai gratuit est terminé sans que le compte complet ait été activé.
 - **`couldn't find remote ref translation-cache`** : la branche du cache n'existe pas (étape 4).
 - **Les liens mènent à `<propriétaire>.github.io/fr/` au lieu de `<propriétaire>.github.io/<dépôt>/fr/`** : `BASE_URL` est mal défini dans `deploy.yml` (étape 3).
-- **Le push du cache échoue** : le workflow a besoin de `contents: write` et `issues: write`. Si votre organisation limite les permissions des workflows, autorisez-les dans *Settings → Actions → General → Workflow permissions*.
+- **Le push du cache échoue** : le workflow a besoin de `contents: write` et `issues: write`. Si votre organisation limite les permissions des workflows, ouvrez `https://github.com/OWNER/REPO/settings/actions` et autorisez-les sous *Workflow permissions*, en bas de la page.
 - **Les titres et le contenu des tableaux `:::{table}` restent en anglais** : limite connue ([#1](https://github.com/polymtl-reproducible-research/myst-translation-kit/issues/1)).
 
 ### Mettre à jour la trousse dans un livre existant
@@ -285,33 +316,51 @@ Do these steps in order: the first push to `main` triggers a deploy, which will 
 
 #### 1. Get a Google Cloud Translation API key
 
+The Google Cloud console is huge, so each step below gives a direct link and says what to click on that page. Links containing `YOUR_PROJECT_ID` need your project's ID (you get it in step 1.1) pasted in its place: they then open straight in the right project, whichever project the console was showing before.
+
 **First time on Google Cloud?** A few one-off steps:
 
 - Sign in with a Google account. An institutional account may have Google Cloud disabled or restricted by its administrator; a personal Gmail account is the simplest.
 - On your first visit to the console, accept the terms of service and choose your country.
-- The first time you set up billing, Google usually offers a free trial (credit to use within a limited time). A credit card is required to verify your identity; nothing is charged during the trial.
-- **Important:** when the trial ends, Google pauses paid services until you activate a full account, and the deploy starts failing with a billing error. Activate the full account (the *Activate* or *Upgrade to full account* button in *Billing*) once the book is live. The 500,000 free characters per month still apply afterwards.
+- The first time you set up billing (step 1.2), Google usually offers a free trial (credit to use within a limited time). A credit card is required to verify your identity; nothing is charged during the trial.
+- **Important:** when the trial ends, Google pauses paid services until you activate a full account, and the deploy starts failing with a billing error. Once the book is live, open <https://console.cloud.google.com/billing>, click your billing account, and on its *Overview* page click **Activate** (or **Upgrade**) in the banner at the top. The 500,000 free characters per month still apply afterwards.
 
-1. **Create a project**: open <https://console.cloud.google.com/projectcreate>, name it (e.g. `my-book-translation`) and click *Create*. If the console drops you into an existing project instead, that's normal: the project picker is the project name at the top left, next to the Google Cloud logo. Use a dedicated project.
+1. **Create a project**
+   - Open <https://console.cloud.google.com/projectcreate>.
+   - *Project name*: e.g. `my-book-translation`. Just below the name, Google shows the **Project ID** it will use (e.g. `my-book-translation-471203`). Note it down: it's `YOUR_PROJECT_ID` in every link below.
+   - Click **Create**.
+   - Creating a project does **not** switch the console to it. Don't navigate with the menus; use the links below, which open your new project directly.
+   - Lost the ID? Click the project name at the top left of the console, next to the Google Cloud logo: the dialog lists every project with its ID.
 
-   **Creating the project doesn't switch you to it**: the console stays on the previous project. Once it's created, click *Select project* in the notification, or choose it in the project picker. Throughout the next steps, check that the URL contains `?project=<your-new-project-id>`: otherwise billing, the API and the key will land in the wrong project.
-2. **Billing**: in the *Billing* menu, link a billing account to the project. The API refuses every request without billing, even inside the free allowance.
-3. **Enable the API**: *APIs & Services → Library*, search for "Cloud Translation API", then *Enable*.
-4. **Create the key**: *APIs & Services → Credentials → Create credentials → API key*. (Ignore the "configure the OAuth consent screen" reminder: it only concerns apps that sign users in, not API keys.) A form opens:
-   - **Name**: something recognizable, e.g. `my-book-translation`.
-   - **API restrictions**: select only "Cloud Translation API". A leaked key can then only be used to translate. (If it isn't in the list, the API isn't enabled in this project: redo step 3.)
-   - **Application restrictions**: leave *None*. The key is used by GitHub Actions servers, whose IP addresses change on every run, and a website restriction only applies to requests made from a browser.
+2. **Link billing**
+   - Open `https://console.cloud.google.com/billing/linkedaccount?project=YOUR_PROJECT_ID`.
+   - If the page says the project has no billing account, click **Link a billing account** and choose yours. If you have none yet, choose **Create billing account** and follow the sign-up (country, card).
+   - Without billing, the API refuses every request, even inside the free allowance.
 
-   Click *Create*. No need to copy the key now: the *Credentials* page shows it again any time with *Show key*, and each step that needs it will tell you to copy it right before you paste it.
-5. **Budget alert** (recommended): budgets belong to the billing account, not the project, so they aren't under *APIs & Services*. Open <https://console.cloud.google.com/billing/budgets> (or type "Budgets" in the console's search bar), pick your billing account, then *Create budget*:
-   - **Scope → Projects**: only your new project, so spending in your other projects isn't counted;
-   - **Amount**: something small, e.g. $5; keep the default email alerts.
+3. **Enable the API**
+   - Open `https://console.cloud.google.com/apis/library/translate.googleapis.com?project=YOUR_PROJECT_ID`.
+   - Check that the project name at the top of the page is your new project, then click the blue **Enable** button. When it's done, the page turns into the API's overview, with a **Manage** button where *Enable* was.
 
-   An alert doesn't stop spending; it tells you. For a hard cap, lower the API's characters-per-day quota instead: <https://console.cloud.google.com/apis/api/translate.googleapis.com/quotas>.
+4. **Create the key**
+   - Open `https://console.cloud.google.com/apis/credentials?project=YOUR_PROJECT_ID`. Ignore the "configure the OAuth consent screen" reminder: it's for apps that sign users in, not for API keys.
+   - At the top of the page, click **+ Create credentials**, then **API key** in the menu that drops down. A form opens:
+     - **Name**: something recognizable, e.g. `my-book-translation`.
+     - **Select API restrictions**: open the dropdown and tick only **Cloud Translation API**. A leaked key can then only be used to translate. (If it isn't in the list, the API isn't enabled in this project: redo step 1.3.)
+     - **Application restrictions**: leave **None**. The key is used by GitHub Actions servers, whose IP addresses change on every run, and a website restriction only applies to requests made from a browser.
+   - Click **Create**. No need to copy the key now: back on the same Credentials page, your key's row in the *API Keys* table has a **Show key** link (in the *Actions* column) that displays it again at any time. Each step that needs the key tells you to fetch it there right before pasting it.
 
-**Where the key goes:** one place only, the GitHub secret in step 5. Don't save it anywhere else. Never put it in a file in the repository (a committed key stays in git history even after it's deleted: treat it as leaked and delete the key), in an issue, pull request or message, or typed out on a command line (it would stay in your shell history).
+5. **Budget alert** (recommended)
+   - Budgets belong to the billing account, not the project. Open <https://console.cloud.google.com/billing/budgets>; if it asks, choose the billing account you linked in step 1.2.
+   - Click **+ Create budget** at the top of the page.
+   - *1 Define*: keep **Alerts only** selected, and give it a *Name* (e.g. `translation`). (*Spend cap enforcement* only works for some services; for a dependable hard limit, use the quota cap at the end of this step.) Click **Next**.
+   - *2 Scope*: in the **Projects** dropdown, select only your new project, so spending in other projects isn't counted. Click **Next**.
+   - *3 Amount*: choose *Specified amount* and enter something small, e.g. `5`. Click **Next**.
+   - *4 Actions*: keep the default thresholds and email alerts. Click **Finish**.
+   - An alert doesn't stop spending; it tells you. For a hard cap instead, open `https://console.cloud.google.com/apis/api/translate.googleapis.com/quotas?project=YOUR_PROJECT_ID`, type `per day` in the *Filter* box above the table, tick the characters-per-day row, click **Edit** (pencil icon), and enter a lower limit.
 
-Check that the key works. Run the first line; while it waits, go to *Credentials*, click *Show key*, copy it and paste it straight into the terminal (nothing appears, that's normal), then press Enter. `read` keeps it out of your shell history:
+**Where the key goes:** one place only, the GitHub secret in step 5.2. Don't save it anywhere else. Never put it in a file in the repository (a committed key stays in git history even after it's deleted: treat it as leaked and delete the key), in an issue, pull request or message, or typed out on a command line (it would stay in your shell history).
+
+**Check that the key works.** Run the first line below; while it waits, open `https://console.cloud.google.com/apis/credentials?project=YOUR_PROJECT_ID`, click **Show key** in your key's row, copy it and paste it straight into the terminal (nothing appears, that's normal), then press Enter. `read` keeps it out of your shell history. Then run the `curl`:
 
 ```bash
 read -rs GOOGLE_TRANSLATE_API_KEY && export GOOGLE_TRANSLATE_API_KEY
@@ -360,16 +409,17 @@ git switch main
 
 #### 5. Configure the GitHub repository
 
-In the repository's *Settings*:
+In the links below, replace `OWNER/REPO` with your repository (e.g. `jane/my-book`).
 
-1. **Pages**: *Pages → Build and deployment → Source*: choose **GitHub Actions**.
-2. **The key**: *Environments → New environment*, named exactly **`translation`**.
-   - Under *Deployment branches and tags*, choose *Selected branches and tags* and add `main`. That way only merged code can read the key.
-   - Under *Environment secrets*, click *Add environment secret* and name it **`GOOGLE_TRANSLATE_API_KEY`**. For the value: in the Google Cloud console, *APIs & Services → Credentials*, click *Show key*, copy it, and paste it straight into the *Value* field. Save.
-3. **Protect `main`**: *Rules → Rulesets → New branch ruleset*, target the default branch, and turn on:
-   - *Require a pull request before merging*, with *Require review from Code Owners* (without it, `CODEOWNERS` blocks nothing);
-   - *Require status checks to pass*, with the **`Translation budget`** check (it appears after the first pull request);
-   - *Block force pushes*.
+1. **Pages**
+   - Open `https://github.com/OWNER/REPO/settings/pages`.
+   - Under *Build and deployment*, open the **Source** dropdown and choose **GitHub Actions**. It applies immediately; there's nothing to save.
+
+2. **The key**
+   - Open `https://github.com/OWNER/REPO/settings/environments/new`.
+   - *Name*: exactly **`translation`**. Click **Configure environment**; you land on the environment's settings page.
+   - *Deployment branches and tags*: open the dropdown (it says *No restriction*) and choose **Selected branches and tags**. Click **Add deployment branch or tag rule**, type `main`, and click **Add rule**. Only merged code can then read the key.
+   - *Environment secrets*, further down the same page: click **Add environment secret**. *Name*: **`GOOGLE_TRANSLATE_API_KEY`**. For the *Value*, open `https://console.cloud.google.com/apis/credentials?project=YOUR_PROJECT_ID` in another tab, click **Show key** in your key's row, copy it, come back and paste it straight into *Value*. Click **Add secret**.
 
 #### 6. Commit and push
 
@@ -380,6 +430,18 @@ git push origin main
 ```
 
 The first deploy translates the whole book (which counts against the free allowance), saves the translations to `translation-cache`, and publishes the site at `https://<owner>.github.io/<repo>/` with the French version at `.../<repo>/fr/`. Later deploys only translate new or changed text.
+
+#### 7. Protect `main`
+
+Do this after the first push: from now on, changes reach `main` only through reviewed pull requests.
+
+- Open `https://github.com/OWNER/REPO/settings/rules/new?target=branch`.
+- *Ruleset name*: `main`. *Enforcement status*: **Active**.
+- *Target branches*: click **Add target**, then **Include default branch**.
+- Under *Branch rules*, leave **Restrict deletions** and **Block force pushes** ticked, and tick:
+  - **Require a pull request before merging**, then, in the options that appear under it, **Require review from Code Owners**. Without it, `CODEOWNERS` blocks nothing.
+  - **Require status checks to pass**, then click **+ Add checks**, type `Translation budget` and select it. The check is only listed once it has run on a pull request: on a brand-new repository, open a first pull request, then come back to this ruleset and add it.
+- Click **Create** at the bottom of the page.
 
 ### Day to day
 
@@ -423,11 +485,11 @@ If the cache already covers every sentence, no key is needed. Otherwise, `export
 ### Troubleshooting
 
 - **`GOOGLE_TRANSLATE_API_KEY is not set`**: the secret is missing, or the environment isn't named exactly `translation`.
-- **`Branch "…" is not allowed to deploy to translation`**: only `main` can read the key (step 5). That's intended; merge the branch first.
-- **A 403 error mentioning billing or a disabled API**: billing isn't linked to the project, the Cloud Translation API isn't enabled (step 1), or the free trial ended without the full account being activated.
+- **`Branch "…" is not allowed to deploy to translation`**: only `main` can read the key (step 5.2). That's intended; merge the branch first.
+- **A 403 error mentioning billing or a disabled API**: billing isn't linked to the project, the Cloud Translation API isn't enabled (steps 1.2 and 1.3), or the free trial ended without the full account being activated.
 - **`couldn't find remote ref translation-cache`**: the cache branch doesn't exist (step 4).
 - **Links go to `<owner>.github.io/fr/` instead of `<owner>.github.io/<repo>/fr/`**: `BASE_URL` is wrong in `deploy.yml` (step 3).
-- **Pushing the cache fails**: the workflow needs `contents: write` and `issues: write`. If your organization restricts workflow permissions, allow them under *Settings → Actions → General → Workflow permissions*.
+- **Pushing the cache fails**: the workflow needs `contents: write` and `issues: write`. If your organization restricts workflow permissions, open `https://github.com/OWNER/REPO/settings/actions` and, under *Workflow permissions* at the bottom, allow them.
 - **Titles and contents of `:::{table}` tables stay in English**: known limitation ([#1](https://github.com/polymtl-reproducible-research/myst-translation-kit/issues/1)).
 
 ### Updating the kit in an existing book
