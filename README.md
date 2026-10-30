@@ -80,7 +80,7 @@ Faites les étapes dans l'ordre : le premier push sur `main` déclenche un dépl
    **Créer le projet ne vous y amène pas** : la console reste sur le projet précédent. Une fois le projet créé, cliquez sur *Sélectionner le projet* dans la notification, ou choisissez-le dans le menu des projets. Pendant toutes les étapes suivantes, vérifiez que l'URL contient `?project=<id-de-votre-nouveau-projet>` : sinon, la facturation, l'API et la clé atterriront dans le mauvais projet.
 2. **Facturation** : dans le menu *Facturation*, associez un compte de facturation au projet. L'API refuse toute requête sans facturation, même à l'intérieur du quota gratuit.
 3. **Activer l'API** : *API et services → Bibliothèque*, cherchez « Cloud Translation API », puis *Activer*.
-4. **Créer la clé** : *API et services → Identifiants → Créer des identifiants → Clé API*. Un formulaire s'ouvre :
+4. **Créer la clé** : *API et services → Identifiants → Créer des identifiants → Clé API*. (Ignorez le rappel « configure the OAuth consent screen » : il ne concerne que les applications qui connectent des utilisateurs, pas les clés d'API.) Un formulaire s'ouvre :
    - **Nom** : quelque chose de reconnaissable, p. ex. `mon-livre-traduction`.
    - **Restrictions d'API** : sélectionnez seulement « Cloud Translation API ». Une clé qui fuit ne pourra alors servir qu'à traduire. (Si elle n'apparaît pas dans la liste, l'API n'est pas activée dans ce projet : refaites l'étape 3.)
    - **Restrictions d'application** : laissez *Aucune*. La clé est utilisée par les serveurs de GitHub Actions, dont les adresses IP changent à chaque exécution, et une restriction par site web ne s'applique qu'aux requêtes faites depuis un navigateur.
@@ -290,7 +290,7 @@ Do these steps in order: the first push to `main` triggers a deploy, which will 
    **Creating the project doesn't switch you to it**: the console stays on the previous project. Once it's created, click *Select project* in the notification, or choose it in the project picker. Throughout the next steps, check that the URL contains `?project=<your-new-project-id>`: otherwise billing, the API and the key will land in the wrong project.
 2. **Billing**: in the *Billing* menu, link a billing account to the project. The API refuses every request without billing, even inside the free allowance.
 3. **Enable the API**: *APIs & Services → Library*, search for "Cloud Translation API", then *Enable*.
-4. **Create the key**: *APIs & Services → Credentials → Create credentials → API key*. A form opens:
+4. **Create the key**: *APIs & Services → Credentials → Create credentials → API key*. (Ignore the "configure the OAuth consent screen" reminder: it only concerns apps that sign users in, not API keys.) A form opens:
    - **Name**: something recognizable, e.g. `my-book-translation`.
    - **API restrictions**: select only "Cloud Translation API". A leaked key can then only be used to translate. (If it isn't in the list, the API isn't enabled in this project: redo step 3.)
    - **Application restrictions**: leave *None*. The key is used by GitHub Actions servers, whose IP addresses change on every run, and a website restriction only applies to requests made from a browser.
