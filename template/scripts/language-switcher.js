@@ -1,12 +1,9 @@
 (function () {
   'use strict';
 
-  // === Flag SVGs as base64 data URIs ===
-  // sourceFlagUri shows on the LEFT (clicking goes to /, the source-language site).
-  // targetFlagUri shows on the RIGHT (clicking goes to /<target_lang>/).
-  // Swap these to match your direction. Defaults: UK (en) + Quebec (fr).
-  var sourceFlagUri = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDYwIDQwIj48cmVjdCB3aWR0aD0iNjAiIGhlaWdodD0iNDAiIGZpbGw9IiMwMTIxNjkiLz48cGF0aCBkPSJNMCwwIEw2MCw0MCBNNjAsMCBMMCw0MCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjgiLz48cGF0aCBkPSJNMCwwIEw2MCw0MCIgc3Ryb2tlPSIjQzgxMDJFIiBzdHJva2Utd2lkdGg9IjQiIGNsaXAtcGF0aD0icG9seWdvbigwIDAsMzAgMjAsNjAgMCw2MCA0MCwzMCAyMCwwIDQwKSIvPjxwYXRoIGQ9Ik02MCwwIEwwLDQwIiBzdHJva2U9IiNDODEwMkUiIHN0cm9rZS13aWR0aD0iNCIgY2xpcC1wYXRoPSJwb2x5Z29uKDAgMCwzMCAyMCwwIDQwLDYwIDQwLDMwIDIwLDYwIDApIi8+PHBhdGggZD0iTTMwLDAgVjQwIE0wLDIwIEg2MCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEyIi8+PHBhdGggZD0iTTMwLDAgVjQwIE0wLDIwIEg2MCIgc3Ryb2tlPSIjQzgxMDJFIiBzdHJva2Utd2lkdGg9IjYiLz48L3N2Zz4=';
-  var targetFlagUri = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDE2Ij48cmVjdCB3aWR0aD0iMjQiIGhlaWdodD0iMTYiIGZpbGw9IiMwMDNEQTUiLz48cmVjdCB4PSIxMCIgeT0iMCIgd2lkdGg9IjQiIGhlaWdodD0iMTYiIGZpbGw9IiNmZmYiLz48cmVjdCB4PSIwIiB5PSI2IiB3aWR0aD0iMjQiIGhlaWdodD0iNCIgZmlsbD0iI2ZmZiIvPjx0ZXh0IHg9IjUiIHk9IjUuNSIgZm9udC1zaXplPSI1IiBmaWxsPSIjZmZmIiBmb250LWZhbWlseT0ic2VyaWYiPuKanDwvdGV4dD48dGV4dCB4PSIxNSIgeT0iNS41IiBmb250LXNpemU9IjUiIGZpbGw9IiNmZmYiIGZvbnQtZmFtaWx5PSJzZXJpZiI+4pqcPC90ZXh0Pjx0ZXh0IHg9IjUiIHk9IjEzLjUiIGZvbnQtc2l6ZT0iNSIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9InNlcmlmIj7impw8L3RleHQ+PHRleHQgeD0iMTUiIHk9IjEzLjUiIGZvbnQtc2l6ZT0iNSIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9InNlcmlmIj7impw8L3RleHQ+PC9zdmc+';
+  // === Flag SVGs as base64 data URIs (avoids all encoding issues) ===
+  var ukUri = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDYwIDQwIj48cmVjdCB3aWR0aD0iNjAiIGhlaWdodD0iNDAiIGZpbGw9IiMwMTIxNjkiLz48cGF0aCBkPSJNMCwwIEw2MCw0MCBNNjAsMCBMMCw0MCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjgiLz48cGF0aCBkPSJNMCwwIEw2MCw0MCIgc3Ryb2tlPSIjQzgxMDJFIiBzdHJva2Utd2lkdGg9IjQiIGNsaXAtcGF0aD0icG9seWdvbigwIDAsMzAgMjAsNjAgMCw2MCA0MCwzMCAyMCwwIDQwKSIvPjxwYXRoIGQ9Ik02MCwwIEwwLDQwIiBzdHJva2U9IiNDODEwMkUiIHN0cm9rZS13aWR0aD0iNCIgY2xpcC1wYXRoPSJwb2x5Z29uKDAgMCwzMCAyMCwwIDQwLDYwIDQwLDMwIDIwLDYwIDApIi8+PHBhdGggZD0iTTMwLDAgVjQwIE0wLDIwIEg2MCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEyIi8+PHBhdGggZD0iTTMwLDAgVjQwIE0wLDIwIEg2MCIgc3Ryb2tlPSIjQzgxMDJFIiBzdHJva2Utd2lkdGg9IjYiLz48L3N2Zz4=';
+  var qcUri = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDE2Ij48cmVjdCB3aWR0aD0iMjQiIGhlaWdodD0iMTYiIGZpbGw9IiMwMDNEQTUiLz48cmVjdCB4PSIxMCIgeT0iMCIgd2lkdGg9IjQiIGhlaWdodD0iMTYiIGZpbGw9IiNmZmYiLz48cmVjdCB4PSIwIiB5PSI2IiB3aWR0aD0iMjQiIGhlaWdodD0iNCIgZmlsbD0iI2ZmZiIvPjx0ZXh0IHg9IjUiIHk9IjUuNSIgZm9udC1zaXplPSI1IiBmaWxsPSIjZmZmIiBmb250LWZhbWlseT0ic2VyaWYiPuKanDwvdGV4dD48dGV4dCB4PSIxNSIgeT0iNS41IiBmb250LXNpemU9IjUiIGZpbGw9IiNmZmYiIGZvbnQtZmFtaWx5PSJzZXJpZiI+4pqcPC90ZXh0Pjx0ZXh0IHg9IjUiIHk9IjEzLjUiIGZvbnQtc2l6ZT0iNSIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9InNlcmlmIj7impw8L3RleHQ+PHRleHQgeD0iMTUiIHk9IjEzLjUiIGZvbnQtc2l6ZT0iNSIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9InNlcmlmIj7impw8L3RleHQ+PC9zdmc+';
 
   // === Widget dimensions (must match CSS below) ===
   var W = 80;
@@ -16,16 +13,6 @@
   var PAD_BOTTOM_MOBILE = 10;
   var PAD_RIGHT_MOBILE = 10;
   var MOBILE_BREAKPOINT = 640;
-
-  // === Read language config from meta tags injected at build time ===
-  function readMeta(name, fallback) {
-    var el = document.querySelector('meta[name="' + name + '"]');
-    return el ? el.getAttribute('content') : fallback;
-  }
-  var baseUrl = (readMeta('base-url', '') || '').replace(/\/$/, '');
-  var SOURCE_LANG = readMeta('source-lang', 'en');
-  var TARGET_LANG = readMeta('target-lang', 'fr');
-  var DEFAULT_LANG = readMeta('default-lang', TARGET_LANG);
 
   // === CSS for the widget (body::after pseudo-element) ===
   // React cannot remove CSS pseudo-elements — they are not DOM nodes.
@@ -40,7 +27,7 @@
     '  width: ' + W + 'px;' +
     '  height: ' + H + 'px;' +
     '  background-color: rgba(255, 255, 255, 0.95);' +
-    '  background-image: url("' + sourceFlagUri + '"), url("' + targetFlagUri + '");' +
+    '  background-image: url("' + ukUri + '"), url("' + qcUri + '");' +
     '  background-repeat: no-repeat, no-repeat;' +
     '  background-position: 8px center, 48px center;' +
     '  background-size: 24px 16px, 24px 16px;' +
@@ -96,25 +83,32 @@
     requestAnimationFrame(styleLoop);
   }
 
+  // === BASE_URL detection ===
+  var baseUrl = '';
+  var metaBase = document.querySelector('meta[name="base-url"]');
+  if (metaBase) {
+    baseUrl = metaBase.getAttribute('content').replace(/\/$/, '');
+  }
+
   // === Language detection and navigation ===
-  function isOnTarget() {
+  function isOnFrench() {
     var path = window.location.pathname;
-    var prefix = baseUrl + '/' + TARGET_LANG;
-    return path === prefix || path.startsWith(prefix + '/');
+    var frPrefix = baseUrl + '/fr';
+    return path === frPrefix || path.startsWith(frPrefix + '/');
   }
 
   function getPageSlug() {
     var path = window.location.pathname;
-    if (isOnTarget()) {
-      return path.slice((baseUrl + '/' + TARGET_LANG).length) || '/';
+    if (isOnFrench()) {
+      return path.slice((baseUrl + '/fr').length) || '/';
     }
     return path.slice(baseUrl.length) || '/';
   }
 
   function switchTo(lang) {
     var slug = getPageSlug();
-    var newPath = lang === TARGET_LANG
-      ? baseUrl + '/' + TARGET_LANG + slug
+    var newPath = lang === 'fr'
+      ? baseUrl + '/fr' + slug
       : baseUrl + slug;
     localStorage.setItem('myst-lang', lang);
     window.location.href = newPath;
@@ -143,21 +137,21 @@
       e.stopPropagation();
       var mid = b.left + W / 2;
       if (e.clientX < mid) {
-        switchTo(SOURCE_LANG);
+        switchTo('en');
       } else {
-        switchTo(TARGET_LANG);
+        switchTo('fr');
       }
     }
   }, true);
 
   // === Auto-redirect based on saved preference ===
   function autoRedirect() {
-    var pref = localStorage.getItem('myst-lang') || DEFAULT_LANG;
-    var onTarget = isOnTarget();
-    if (pref === TARGET_LANG && !onTarget) {
-      switchTo(TARGET_LANG);
-    } else if (pref === SOURCE_LANG && onTarget) {
-      switchTo(SOURCE_LANG);
+    var pref = localStorage.getItem('myst-lang') || 'fr';
+    var onFr = isOnFrench();
+    if (pref === 'fr' && !onFr) {
+      switchTo('fr');
+    } else if (pref === 'en' && onFr) {
+      switchTo('en');
     }
   }
 
