@@ -1,0 +1,21 @@
+name: Tests
+
+# Runs the template's own test suite. The workflows under template/.github/ are
+# meant for the book that copies them and never run in this repository.
+
+on:
+  pull_request:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+      - run: pip install pytest pyyaml
+      - run: python3 -m pytest template/tests/ -v

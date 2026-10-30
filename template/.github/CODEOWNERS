@@ -1,0 +1,19 @@
+# Replace @your-github-username below with the people who should review any
+# change that could reach the API key (one or more usernames or @org/team names).
+#
+# Anything the deploy workflow executes can read GOOGLE_TRANSLATE_API_KEY,
+# which is billed to a real account. Changes to these paths need review from
+# someone who knows what that means.
+#
+# /.github/ covers this file too: without that, a pull request could remove
+# these rules with an approval from anyone.
+#
+# Book content is deliberately not owned. Pages and pinned translations cannot
+# reach the key, and gating them would make the owners a bottleneck on the
+# actual writing.
+#
+# These rules only block merges once "Require review from Code Owners" is on
+# for the main branch (see the kit's README).
+
+/.github/    @your-github-username
+/scripts/    @your-github-username

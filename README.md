@@ -2,9 +2,11 @@
 
 **[Français](#français) · [English](#english)**
 
-Une trousse clé en main qui ajoute la **traduction automatique au moment du build** et un **sélecteur de langue** à n'importe quel livre MyST déployé sur GitHub Pages. Fonctionne dans les deux sens — traduire des sources anglaises vers le français, des sources françaises vers l'anglais, ou toute autre paire prise en charge par Google Translate.
+Une trousse qui ajoute une **version française générée au build** et un **sélecteur de langue EN/FR** à un livre MyST écrit en anglais et déployé sur GitHub Pages.
 
-A drop-in kit that adds **build-time machine translation** plus a **flag widget** to any MyST book deployed via GitHub Pages. Works in either direction — translate English sources into French, French sources into English, or any other Google-Translate-supported pair.
+A kit that adds a **build-time French version** and an **EN/FR language switcher** to an English MyST book deployed on GitHub Pages.
+
+**Exemple en pratique / Live example:** [polymtl-reproducible-research/myst_book](https://github.com/polymtl-reproducible-research/myst_book) → <https://reproducible-research.polymtl.ca/>
 
 ---
 
@@ -12,175 +14,196 @@ A drop-in kit that adds **build-time machine translation** plus a **flag widget*
 
 ### En quoi ça consiste
 
-GitHub Actions traduit chaque fichier source Markdown et carnet Jupyter via Google Translate (à l'aide de `deep-translator`), construit un second site MyST sous `/<target_lang>/`, et injecte dans chaque page HTML un sélecteur de langue résistant à React. Le résultat : deux sites MyST indépendants — votre langue source à `/` et la langue traduite à `/<target_lang>/` — avec un seul widget flottant pour passer de l'un à l'autre.
+À chaque déploiement, GitHub Actions construit votre livre anglais à `/`, traduit chaque page en français avec l'API **Google Cloud Translation**, construit un second site MyST à `/fr/`, puis injecte dans chaque page un petit widget de drapeaux pour passer d'une langue à l'autre.
 
-Pour les détails d'architecture (pourquoi `adoptedStyleSheets`, comment les directives sont préservées, comment le DOM Remix/React est contourné), voir `scripts/TRANSLATION.md` dans le dépôt d'origine d'où cette trousse est extraite. Ce README est le guide de portage.
+Autour de la traduction elle-même :
 
-**Exemple en pratique :** [polymtl-reproducible-research/myst_book](https://github.com/polymtl-reproducible-research/myst_book) implémente cette trousse — un livre MyST anglais avec une version française générée au build, déployé sur GitHub Pages.
+- **Un cache de traductions** (branche `translation-cache`) : chaque phrase n'est payée qu'une fois. Un build dont le cache couvre déjà tout n'appelle pas Google du tout.
+- **Des traductions épinglées** (`translations/fr.overrides.json`) : pour corriger à la main une phrase mal traduite.
+- **Une estimation du coût sur chaque pull request** : un commentaire indique combien de caractères seront envoyés à Google, et la vérification échoue si le mois dépasserait le quota gratuit.
+- **Une revue obligatoire** (`CODEOWNERS`) pour tout changement qui pourrait lire la clé d'API.
+- **Une issue ouverte automatiquement** quand le déploiement échoue, et fermée au prochain succès.
 
-### Prérequis
+Pour l'architecture en détail, voir [`template/scripts/TRANSLATION.md`](template/scripts/TRANSLATION.md).
 
-Le projet MyST cible doit :
+> **Anglais → français seulement, pour l'instant.** Le sens inverse (et d'autres paires de langues) est suivi dans [#2](https://github.com/polymtl-reproducible-research/myst-translation-kit/issues/2).
 
-- Utiliser MyST avec un `myst.yml` contenant un `project.toc`.
-- Se déployer via GitHub Actions vers GitHub Pages.
-- Tourner sur `ubuntu-latest` (Python 3 est disponible par défaut ; aucune configuration supplémentaire requise).
+### Ce qu'il vous faut
 
-Aucune clé API, aucun secret, aucun service payant requis.
+- Un livre MyST en anglais dans un dépôt GitHub, avec un `myst.yml` qui contient un `project.toc`.
+- Les droits d'administration sur ce dépôt.
+- Un compte Google Cloud **avec la facturation activée** (une carte de crédit est demandée). Les 500 000 premiers caractères par mois sont gratuits, ce qui couvre largement un livre de cours ; au-delà, c'est 20 $ US par million de caractères. Grâce au cache, seul le texte nouveau ou modifié est envoyé à Google.
 
 ### Contenu de la trousse
 
+Tout ce qui se trouve dans `template/` se copie tel quel à la racine de votre livre :
+
 ```
-myst-translation-kit/
-├── README.md                          # ce fichier
+template/
 ├── scripts/
-│   ├── translation-config.yml         # ← MODIFIER pour définir la paire de langues
-│   ├── translate-sources.py           # Parcourt le TOC de myst.yml, traduit .md + .ipynb
-│   ├── build-translation.py           # Orchestre le build traduit vers _build/html/<target_lang>/
-│   ├── inject-language-switcher.py    # Injecte les balises <meta> + <script> dans chaque page HTML
-│   └── language-switcher.js           # Le widget lui-même (lit les balises meta à l'exécution)
+│   ├── build-french.py                # Orchestre le build français vers _build/html/fr/
+│   ├── translate_sources.py           # Parcourt le TOC de myst.yml et traduit .md et .ipynb
+│   ├── md_segmenter.py                # Découpe le Markdown : prose à traduire, code et directives à garder
+│   ├── shielding.py                   # Protège liens, code, rôles et maths pendant la traduction
+│   ├── resolver.py                    # Épinglées → cache → Google, et refuse de publier à moitié traduit
+│   ├── translator_backend.py          # Le seul module qui parle à l'API Cloud Translation
+│   ├── estimate_translation.py        # Estimation du coût pour les pull requests
+│   ├── inject-language-switcher.py    # Injecte le widget dans chaque page HTML
+│   ├── language-switcher.js           # Le widget lui-même
+│   └── TRANSLATION.md                 # Explication de l'architecture
+├── tests/                             # Tests pytest des scripts
+├── translations/
+│   └── fr.overrides.json              # Vos traductions épinglées (vide au départ)
 └── .github/
+    ├── CODEOWNERS                     # ← À MODIFIER : qui doit réviser les changements sensibles
     └── workflows/
-        └── deploy.yml                 # Workflow de déploiement Pages prêt à l'emploi
+        ├── deploy.yml                 # Build EN + FR et déploiement sur GitHub Pages
+        ├── tests.yml                  # pytest à chaque push
+        └── translation-estimate.yml   # Commentaire d'estimation sur les pull requests
 ```
 
-### Étapes d'installation
+### Installation
 
-#### 1. Copier les scripts dans le dépôt cible
+Faites les étapes dans l'ordre : le premier push sur `main` déclenche un déploiement, qui échouera si la clé ou la branche de cache n'existent pas encore.
 
-Depuis la racine du projet cible :
+#### 1. Obtenir une clé d'API Google Cloud Translation
+
+1. Allez sur la [console Google Cloud](https://console.cloud.google.com/) et créez un projet (p. ex. `mon-livre-traduction`).
+2. **Facturation** : dans le menu *Facturation*, associez un compte de facturation au projet. L'API refuse toute requête sans facturation, même à l'intérieur du quota gratuit.
+3. **Activer l'API** : *API et services → Bibliothèque*, cherchez « Cloud Translation API », puis *Activer*.
+4. **Créer la clé** : *API et services → Identifiants → Créer des identifiants → Clé API*. Copiez-la.
+5. **Restreindre la clé** (fortement recommandé) : modifiez la clé, puis sous *Restrictions d'API* choisissez *Restreindre la clé* et cochez seulement « Cloud Translation API ». Une clé qui fuit ne pourra alors servir qu'à traduire.
+6. **Alerte budgétaire** (recommandé) : *Facturation → Budgets et alertes*, créez un petit budget (p. ex. 5 $) avec alertes par courriel. Une alerte n'arrête pas les dépenses : elle vous prévient. Pour un plafond strict, réduisez le quota de caractères par jour de l'API dans *API et services → Cloud Translation API → Quotas*.
+
+Vérifiez que la clé fonctionne :
 
 ```bash
-mkdir -p scripts
-cp /chemin/vers/myst-translation-kit/scripts/* scripts/
+curl -s "https://translation.googleapis.com/language/translate/v2" \
+  -d key="VOTRE_CLÉ" -d q="Hello world" -d source=en -d target=fr
 ```
 
-Conservez les noms de fichiers tels quels — les scripts et le workflow s'y réfèrent par leur nom.
+La réponse doit contenir `"translatedText": "Bonjour le monde"`. Ne commitez jamais la clé : elle ira uniquement dans les secrets GitHub (étape 5).
 
-#### 2. Définir la paire de langues
-
-Modifiez `scripts/translation-config.yml` dans le projet cible. Les champs sont :
-
-```yaml
-source_lang: en      # Langue de vos fichiers sources existants. Le site est à /
-target_lang: fr      # Langue VERS laquelle traduire. Le site traduit est à /<target_lang>/
-default_lang: fr     # Langue par défaut du widget à la première visite
-source_label: EN     # Étiquette courte (cosmétique)
-target_label: FR     # Étiquette courte (cosmétique)
-```
-
-**Pour un livre anglais qui doit aussi exister en français :** conservez les valeurs par défaut ci-dessus.
-
-**Pour un livre français qui doit aussi exister en anglais :**
-
-```yaml
-source_lang: fr
-target_lang: en
-default_lang: fr     # la plupart des visiteurs arrivant pour la première fois obtiennent le français
-source_label: FR
-target_label: EN
-```
-
-Les codes de langue suivent la convention [ISO 639-1](https://fr.wikipedia.org/wiki/Liste_des_codes_ISO_639-1) utilisée par Google Translate (`en`, `fr`, `es`, `de`, `pt`, `it`, `ja`, ...).
-
-Vous voudrez probablement aussi inverser les drapeaux SVG dans `scripts/language-switcher.js` — voir [Personnalisation](#personnalisation) ci-dessous.
-
-#### 3. Brancher le workflow GitHub Actions
-
-**Option A — nouveau projet (aucun workflow existant).** Copiez le workflow fourni tel quel :
+#### 2. Copier la trousse dans votre livre
 
 ```bash
-mkdir -p .github/workflows
-cp /chemin/vers/myst-translation-kit/.github/workflows/deploy.yml .github/workflows/deploy.yml
+git clone https://github.com/polymtl-reproducible-research/myst-translation-kit.git
+cd mon-livre
+cp -R ../myst-translation-kit/template/. .
 ```
 
-**Option B — workflow existant.** Ajoutez ces blocs à votre `.github/workflows/deploy.yml` existant :
+Attention : cela remplace `.github/workflows/deploy.yml`, `.github/workflows/tests.yml` et `.github/CODEOWNERS` s'ils existent déjà. Si vous aviez votre propre workflow de déploiement, fusionnez-le avec celui de la trousse plutôt que de l'écraser.
 
-```yaml
-# 1. Définir BASE_URL au niveau supérieur (nécessaire pour que les liens
-#    /<target_lang>/ se résolvent sous username.github.io/reponame/)
-env:
-  BASE_URL: /${{ github.event.repository.name }}
-
-# 2. Après les étapes checkout/setup, installer les dépendances Python :
-- name: Install Python dependencies
-  run: pip install deep-translator pyyaml
-
-# 3. Après « myst build --html », lancer les étapes de traduction + injection :
-- name: Translate and build secondary-language site
-  run: python3 scripts/build-translation.py
-
-- name: Inject Language Switcher
-  run: python3 scripts/inject-language-switcher.py
-```
-
-L'ordre est important : `myst build --html` → `build-translation.py` → `inject-language-switcher.py` → upload de l'artefact.
-
-#### 4. Ignorer le dossier de traduction généré
-
-Ajoutez au `.gitignore` du projet cible :
+Ajoutez à votre `.gitignore` :
 
 ```
+_build/
 _translated/
+.tcache/
+__pycache__/
 ```
 
-`_translated/<target_lang>/` est la zone de préparation du build traduit ; elle est régénérée à chaque exécution et ne doit jamais être committée.
+#### 3. Adapter deux fichiers
 
-#### 5. Commit, push, terminé
+- **`.github/CODEOWNERS`** : remplacez `@your-github-username` par les personnes qui doivent réviser tout changement à `scripts/` ou `.github/` (le code qui peut lire la clé).
+- **`.github/workflows/deploy.yml`** : `BASE_URL` vaut `/<nom-du-dépôt>`, ce qui convient à `https://<propriétaire>.github.io/<dépôt>/`. Si vous utilisez un **domaine personnalisé**, mettez `BASE_URL: ""`.
 
-Au push, GitHub Actions va :
+#### 4. Créer la branche du cache
 
-1. Construire le site en langue source → `_build/html/`
-2. Traduire toutes les sources → `_translated/<target_lang>/`
-3. Construire le site traduit → `_build/html/<target_lang>/`
-4. Injecter le widget de langue dans chaque page HTML
-5. Déployer `_build/html/` sur Pages
-
-Le site sera à `https://<owner>.github.io/<repo>/`, la version traduite à `https://<owner>.github.io/<repo>/<target_lang>/`.
-
-### Vérifier localement
-
-Avant de pousser, confirmez que tout fonctionne sur votre machine :
+Le déploiement lit et met à jour `fr.cache.json` sur une branche séparée, `translation-cache`. Créez-la vide :
 
 ```bash
-pip install deep-translator pyyaml
-myst build --html
-python3 scripts/build-translation.py
-python3 scripts/inject-language-switcher.py
+git switch --orphan translation-cache
+echo '{}' > fr.cache.json
+git add fr.cache.json
+git commit -m "Start the French translation cache"
+git push origin translation-cache
+git switch main
 ```
 
-Ouvrez ensuite `_build/html/index.html` et `_build/html/<target_lang>/index.html` — les deux doivent afficher le widget de langue en bas à droite.
+#### 5. Configurer le dépôt GitHub
 
-Note : en local, `BASE_URL` est vide, donc les liens se résolvent depuis `/`. En CI, il est défini automatiquement à `/<reponame>`.
+Dans *Settings* du dépôt :
+
+1. **Pages** : *Pages → Build and deployment → Source* : choisissez **GitHub Actions**.
+2. **La clé** : *Environments → New environment*, nommé exactement **`translation`**.
+   - Sous *Deployment branches and tags*, choisissez *Selected branches and tags* et ajoutez `main`. Ainsi, seul du code déjà fusionné peut lire la clé.
+   - Sous *Environment secrets*, ajoutez **`GOOGLE_TRANSLATE_API_KEY`** avec la clé de l'étape 1.
+3. **Protéger `main`** : *Rules → Rulesets → New branch ruleset*, ciblez la branche par défaut, et activez :
+   - *Require a pull request before merging*, avec *Require review from Code Owners* (sans cela, `CODEOWNERS` n'empêche rien) ;
+   - *Require status checks to pass*, avec la vérification **`Translation budget`** (elle apparaît après la première pull request) ;
+   - *Block force pushes*.
+
+#### 6. Commit et push
+
+```bash
+git add -A
+git commit -m "Add the French translation kit"
+git push origin main
+```
+
+Le premier déploiement traduit tout le livre (ce qui compte dans le quota gratuit), enregistre les traductions sur `translation-cache`, et publie le site à `https://<propriétaire>.github.io/<dépôt>/` et la version française à `.../<dépôt>/fr/`. Les déploiements suivants ne traduisent que le texte nouveau ou modifié.
+
+### Au quotidien
+
+- **Écrire** : ouvrez une pull request comme d'habitude. Un commentaire *Translation estimate* indique ce qui sera envoyé à Google et ce que le mois a déjà utilisé.
+- **Corriger une traduction** : ajoutez une entrée dans `translations/fr.overrides.json`. La clé est le texte anglais tel que le pipeline le voit : les liens et le code y sont remplacés par des marqueurs `XPHX0XPHX`, `XPHX1XPHX`… Copiez la clé exacte depuis le cache (`fr.cache.json` sur `translation-cache`) ou depuis le message d'erreur du build :
+
+  ```json
+  {
+    "Install [Git]XPHX0XPHX on your system.": "Installez [Git]XPHX0XPHX sur votre système."
+  }
+  ```
+
+- **Quand le déploiement échoue** : une issue « Deploy is failing » s'ouvre avec le lien vers l'exécution. Les causes habituelles : une phrase que Google abîme systématiquement (épinglez-la), ou un problème de clé (voir *Dépannage*). Rien n'est publié tant que les deux langues ne se construisent pas, pour ne jamais faire disparaître `/fr/` du site en ligne.
+
+### Construire localement
+
+```bash
+pip install pyyaml pytest
+mkdir -p .tcache
+git fetch origin translation-cache
+git show origin/translation-cache:fr.cache.json > .tcache/fr.cache.json
+
+myst build --html
+python3 scripts/build-french.py --cache .tcache/fr.cache.json
+python3 scripts/inject-language-switcher.py
+python3 -m pytest tests/
+```
+
+Si le cache couvre déjà toutes les phrases, aucune clé n'est nécessaire. Sinon, faites `export GOOGLE_TRANSLATE_API_KEY=...` avant le build français, en sachant que ces caractères comptent dans votre quota. Ouvrez ensuite `_build/html/index.html` et `_build/html/fr/index.html`.
 
 ### Personnalisation
 
-| Quoi | Où | Comment |
-|------|-----|---------|
-| Paire de langues | `scripts/translation-config.yml` | Modifier `source_lang` / `target_lang` (codes ISO 639-1) |
-| Langue d'arrivée par défaut | `scripts/translation-config.yml` | Mettre `default_lang` à `source_lang` ou `target_lang` |
-| Images de drapeaux | `scripts/language-switcher.js` | Remplacer `sourceFlagUri` / `targetFlagUri` (data URIs base64). Drapeau gauche = source, droit = cible |
-| Position / taille du widget | `scripts/language-switcher.js` | Constantes `W`, `H`, `PAD_BOTTOM`, `PAD_RIGHT` |
-| Corrections de termes spécifiques | `scripts/translate-sources.py` | Ajouter un `.replace(...)` post-traduction dans `translate_text()` |
-
-#### Générer de nouveaux data URIs de drapeaux
-
-Les drapeaux sont des SVG base64 en ligne : ils vivent dans le JS et se chargent sans aucune requête réseau. Pour en remplacer un :
-
-```bash
-# À partir de n'importe quel fichier SVG :
-base64 -i mon-drapeau.svg | pbcopy   # macOS
-# Puis dans language-switcher.js :
-#   var sourceFlagUri = 'data:image/svg+xml;base64,<coller>';
-```
+| Quoi | Où |
+|------|-----|
+| Langue par défaut à la première visite | `scripts/language-switcher.js` : remplacer `\|\| 'fr'` par `\|\| 'en'` |
+| Images des drapeaux | `scripts/language-switcher.js` : `ukUri` / `qcUri` (SVG en base64) |
+| Position et taille du widget | `scripts/language-switcher.js` : `W`, `H`, `PAD_BOTTOM`, `PAD_RIGHT` |
+| Dossiers copiés tels quels dans le build français | `scripts/translate_sources.py` : `ASSET_DIRS` (par défaut `images`, `figures`, `bibliography`) |
+| Quota mensuel utilisé par l'estimation | `scripts/estimate_translation.py` : `FREE_TIER_CHARACTERS` |
 
 ### Dépannage
 
-- **Les liens `/<target_lang>/` mènent à `username.github.io/<target_lang>/` au lieu de `username.github.io/reponame/<target_lang>/`** — `BASE_URL` n'est pas défini dans le `env:` de premier niveau du workflow. Le `deploy.yml` fourni le définit à partir de `github.event.repository.name` ; vérifiez qu'il y est.
-- **Limitation de débit de Google Translate sur les gros livres** — `translate-sources.py` attend 300 ms entre chaque appel. Pour de très gros projets, augmentez les valeurs `time.sleep(0.3)`.
-- **Le widget redirige vers la mauvaise langue au premier chargement** — c'est la redirection automatique vers `default_lang`. Modifiez `scripts/translation-config.yml` et relancez le build.
-- **Les drapeaux ne correspondent pas à votre sens de traduction** — rappelez-vous que le drapeau de GAUCHE est la langue source (`/`) et celui de DROITE la cible (`/<target_lang>/`). Si vous avez inversé `source_lang` et `target_lang`, inversez aussi `sourceFlagUri` et `targetFlagUri` dans `language-switcher.js`.
-- **Erreurs d'analyse de `myst.yml` pendant le build traduit** — généralement `abbreviations:` sans entrées. `translate-sources.py` supprime déjà les abréviations vides ; si vous avez ajouté d'autres clés de premier niveau nulles/vides, retirez-les dans `create_translated_myst_yml()`.
+- **`GOOGLE_TRANSLATE_API_KEY is not set`** : le secret manque, ou l'environnement ne s'appelle pas exactement `translation`.
+- **`Branch "…" is not allowed to deploy to translation`** : seul `main` peut lire la clé (étape 5). C'est voulu ; fusionnez d'abord la branche.
+- **Erreur 403 mentionnant la facturation ou une API désactivée** : la facturation n'est pas associée au projet, ou l'API Cloud Translation n'est pas activée (étape 1).
+- **`couldn't find remote ref translation-cache`** : la branche du cache n'existe pas (étape 4).
+- **Les liens mènent à `<propriétaire>.github.io/fr/` au lieu de `<propriétaire>.github.io/<dépôt>/fr/`** : `BASE_URL` est mal défini dans `deploy.yml` (étape 3).
+- **Le push du cache échoue** : le workflow a besoin de `contents: write` et `issues: write`. Si votre organisation limite les permissions des workflows, autorisez-les dans *Settings → Actions → General → Workflow permissions*.
+- **Les titres et le contenu des tableaux `:::{table}` restent en anglais** : limite connue ([#1](https://github.com/polymtl-reproducible-research/myst-translation-kit/issues/1)).
+
+### Mettre à jour la trousse dans un livre existant
+
+Recopiez seulement le code, pas vos fichiers à vous :
+
+```bash
+cp -R ../myst-translation-kit/template/scripts/. scripts/
+cp -R ../myst-translation-kit/template/tests/. tests/
+cp ../myst-translation-kit/template/.github/workflows/*.yml .github/workflows/
+```
+
+Ne recopiez pas `translations/fr.overrides.json` (vos traductions épinglées) ni `.github/CODEOWNERS`, et revérifiez `BASE_URL` dans `deploy.yml`.
 
 ---
 
@@ -188,172 +211,193 @@ base64 -i mon-drapeau.svg | pbcopy   # macOS
 
 ### What this is
 
-GitHub Actions translates every Markdown and Jupyter Notebook source file through Google Translate (via `deep-translator`), builds a second MyST site under `/<target_lang>/`, and injects a React-proof flag widget into every HTML page. The result is two independent MyST sites — your source language at `/` and the translated language at `/<target_lang>/` — with a single floating widget for switching between them.
+On every deploy, GitHub Actions builds your English book at `/`, translates every page into French with the **Google Cloud Translation** API, builds a second MyST site at `/fr/`, and injects a small flag widget into every page for switching between the two.
 
-For the architectural deep-dive (why `adoptedStyleSheets`, how directives are preserved, how the Remix/React DOM is worked around), see `scripts/TRANSLATION.md` in the upstream repo this kit was extracted from. This README is the porting guide.
+Around the translation itself:
 
-**Live example:** [polymtl-reproducible-research/myst_book](https://github.com/polymtl-reproducible-research/myst_book) implements this kit — an English MyST book with a build-time-generated French version, deployed on GitHub Pages.
+- **A translation cache** (the `translation-cache` branch): every sentence is paid for once. A build the cache already covers makes no call to Google at all.
+- **Pinned translations** (`translations/fr.overrides.json`): for correcting a bad translation by hand.
+- **A cost estimate on every pull request**: a comment says how many characters will be sent to Google, and the check fails if the month would go past the free allowance.
+- **Required review** (`CODEOWNERS`) for any change that could read the API key.
+- **An issue opened automatically** when the deploy fails, and closed on the next success.
 
-### Prerequisites
+For the architecture in detail, see [`template/scripts/TRANSLATION.md`](template/scripts/TRANSLATION.md).
 
-The target MyST project must:
+> **English → French only, for now.** The reverse direction (and other language pairs) is tracked in [#2](https://github.com/polymtl-reproducible-research/myst-translation-kit/issues/2).
 
-- Use MyST with a `myst.yml` containing a `project.toc`.
-- Deploy via GitHub Actions to GitHub Pages.
-- Run on `ubuntu-latest` (Python 3 is available by default; no extra setup needed).
+### What you need
 
-No API keys, secrets, or paid services required.
+- An English MyST book in a GitHub repository, with a `myst.yml` containing a `project.toc`.
+- Admin rights on that repository.
+- A Google Cloud account **with billing enabled** (a credit card is required). The first 500,000 characters each month are free, which comfortably covers a course book; beyond that it's US$20 per million characters. Thanks to the cache, only new or changed text is ever sent to Google.
 
-### What's in this kit
+### What's in the kit
+
+Everything under `template/` is copied as-is into the root of your book:
 
 ```
-myst-translation-kit/
-├── README.md                          # this file
+template/
 ├── scripts/
-│   ├── translation-config.yml         # ← EDIT THIS to set the language pair
-│   ├── translate-sources.py           # Walks myst.yml TOC, translates .md + .ipynb
-│   ├── build-translation.py           # Orchestrates the translated build into _build/html/<target_lang>/
-│   ├── inject-language-switcher.py    # Injects <meta> + <script> tags into every built HTML file
-│   └── language-switcher.js           # The widget itself (reads meta tags at runtime)
+│   ├── build-french.py                # Orchestrates the French build into _build/html/fr/
+│   ├── translate_sources.py           # Walks the myst.yml TOC and translates .md and .ipynb
+│   ├── md_segmenter.py                # Splits Markdown: prose to translate, code and directives to keep
+│   ├── shielding.py                   # Protects links, code, roles and math during translation
+│   ├── resolver.py                    # Pinned → cache → Google, and refuses to publish half-translated
+│   ├── translator_backend.py          # The only module that talks to the Cloud Translation API
+│   ├── estimate_translation.py        # Cost estimate for pull requests
+│   ├── inject-language-switcher.py    # Injects the widget into every HTML page
+│   ├── language-switcher.js           # The widget itself
+│   └── TRANSLATION.md                 # Architecture explanation
+├── tests/                             # pytest tests for the scripts
+├── translations/
+│   └── fr.overrides.json              # Your pinned translations (empty to start)
 └── .github/
+    ├── CODEOWNERS                     # ← EDIT THIS: who must review sensitive changes
     └── workflows/
-        └── deploy.yml                 # Ready-to-use Pages deploy workflow
+        ├── deploy.yml                 # EN + FR build and GitHub Pages deploy
+        ├── tests.yml                  # pytest on every push
+        └── translation-estimate.yml   # Estimate comment on pull requests
 ```
 
-### Install steps
+### Setup
 
-#### 1. Copy the scripts into the target repo
+Do these steps in order: the first push to `main` triggers a deploy, which will fail if the key or the cache branch don't exist yet.
 
-From the target project's root:
+#### 1. Get a Google Cloud Translation API key
+
+1. Go to the [Google Cloud console](https://console.cloud.google.com/) and create a project (e.g. `my-book-translation`).
+2. **Billing**: in the *Billing* menu, link a billing account to the project. The API refuses every request without billing, even inside the free allowance.
+3. **Enable the API**: *APIs & Services → Library*, search for "Cloud Translation API", then *Enable*.
+4. **Create the key**: *APIs & Services → Credentials → Create credentials → API key*. Copy it.
+5. **Restrict the key** (strongly recommended): edit the key, and under *API restrictions* choose *Restrict key* and tick only "Cloud Translation API". A leaked key can then only be used to translate.
+6. **Budget alert** (recommended): *Billing → Budgets & alerts*, create a small budget (e.g. $5) with email alerts. An alert doesn't stop spending; it tells you. For a hard cap, lower the API's characters-per-day quota under *APIs & Services → Cloud Translation API → Quotas*.
+
+Check that the key works:
 
 ```bash
-mkdir -p scripts
-cp /path/to/myst-translation-kit/scripts/* scripts/
+curl -s "https://translation.googleapis.com/language/translate/v2" \
+  -d key="YOUR_KEY" -d q="Hello world" -d source=en -d target=fr
 ```
 
-Keep the filenames as-is — the scripts and the workflow reference them by name.
+The response should contain `"translatedText": "Bonjour le monde"`. Never commit the key: it only goes into GitHub's secrets (step 5).
 
-#### 2. Set the language pair
-
-Edit `scripts/translation-config.yml` in the target project. The four fields are:
-
-```yaml
-source_lang: en      # Language of your existing source files. Site lives at /
-target_lang: fr      # Language to translate INTO. Translated site lives at /<target_lang>/
-default_lang: fr     # Which side the widget defaults to on first visit
-source_label: EN     # Cosmetic short label
-target_label: FR     # Cosmetic short label
-```
-
-**For an English book that should also be in French:** keep the defaults above.
-
-**For a French book that should also be in English:**
-
-```yaml
-source_lang: fr
-target_lang: en
-default_lang: fr     # most visitors arriving for the first time get French
-source_label: FR
-target_label: EN
-```
-
-Source codes follow the [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes) convention used by Google Translate (`en`, `fr`, `es`, `de`, `pt`, `it`, `ja`, ...).
-
-You probably also want to flip the flag SVGs in `scripts/language-switcher.js` — see [Customization](#customization) below.
-
-#### 3. Wire up the GitHub Actions workflow
-
-**Option A — fresh project (no existing workflow).** Copy the bundled workflow wholesale:
+#### 2. Copy the kit into your book
 
 ```bash
-mkdir -p .github/workflows
-cp /path/to/myst-translation-kit/.github/workflows/deploy.yml .github/workflows/deploy.yml
+git clone https://github.com/polymtl-reproducible-research/myst-translation-kit.git
+cd my-book
+cp -R ../myst-translation-kit/template/. .
 ```
 
-**Option B — existing workflow.** Add these blocks to your existing `.github/workflows/deploy.yml`:
+Careful: this replaces `.github/workflows/deploy.yml`, `.github/workflows/tests.yml` and `.github/CODEOWNERS` if they already exist. If you had your own deploy workflow, merge it with the kit's rather than overwriting it.
 
-```yaml
-# 1. Set BASE_URL at the top level (needed so /<target_lang>/ links resolve under
-#    username.github.io/reponame/)
-env:
-  BASE_URL: /${{ github.event.repository.name }}
-
-# 2. After the checkout/setup steps, install Python deps:
-- name: Install Python dependencies
-  run: pip install deep-translator pyyaml
-
-# 3. After "myst build --html", run the translation + injection steps:
-- name: Translate and build secondary-language site
-  run: python3 scripts/build-translation.py
-
-- name: Inject Language Switcher
-  run: python3 scripts/inject-language-switcher.py
-```
-
-Order matters: `myst build --html` → `build-translation.py` → `inject-language-switcher.py` → upload artifact.
-
-#### 4. Gitignore the generated translation directory
-
-Add to the target project's `.gitignore`:
+Add to your `.gitignore`:
 
 ```
+_build/
 _translated/
+.tcache/
+__pycache__/
 ```
 
-`_translated/<target_lang>/` is the staging area for the translated build; it's regenerated every run and should never be committed.
+#### 3. Adapt two files
 
-#### 5. Commit, push, done
+- **`.github/CODEOWNERS`**: replace `@your-github-username` with the people who must review any change to `scripts/` or `.github/` (the code that can read the key).
+- **`.github/workflows/deploy.yml`**: `BASE_URL` is `/<repo-name>`, which is right for `https://<owner>.github.io/<repo>/`. If you use a **custom domain**, set `BASE_URL: ""`.
 
-On push, GitHub Actions will:
+#### 4. Create the cache branch
 
-1. Build the source-language site → `_build/html/`
-2. Translate all sources → `_translated/<target_lang>/`
-3. Build the translated site → `_build/html/<target_lang>/`
-4. Inject the flag widget into every HTML page
-5. Deploy `_build/html/` to Pages
-
-The site will be at `https://<owner>.github.io/<repo>/` with the translated version at `https://<owner>.github.io/<repo>/<target_lang>/`.
-
-### Verifying locally
-
-Before pushing, confirm everything works on your machine:
+The deploy reads and updates `fr.cache.json` on a separate branch, `translation-cache`. Create it empty:
 
 ```bash
-pip install deep-translator pyyaml
-myst build --html
-python3 scripts/build-translation.py
-python3 scripts/inject-language-switcher.py
+git switch --orphan translation-cache
+echo '{}' > fr.cache.json
+git add fr.cache.json
+git commit -m "Start the French translation cache"
+git push origin translation-cache
+git switch main
 ```
 
-Then open `_build/html/index.html` and `_build/html/<target_lang>/index.html` — both should render with the flag widget in the bottom-right corner.
+#### 5. Configure the GitHub repository
 
-Note: locally, `BASE_URL` is empty, so links resolve from `/`. In CI it's set to `/<reponame>` automatically.
+In the repository's *Settings*:
+
+1. **Pages**: *Pages → Build and deployment → Source*: choose **GitHub Actions**.
+2. **The key**: *Environments → New environment*, named exactly **`translation`**.
+   - Under *Deployment branches and tags*, choose *Selected branches and tags* and add `main`. That way only merged code can read the key.
+   - Under *Environment secrets*, add **`GOOGLE_TRANSLATE_API_KEY`** with the key from step 1.
+3. **Protect `main`**: *Rules → Rulesets → New branch ruleset*, target the default branch, and turn on:
+   - *Require a pull request before merging*, with *Require review from Code Owners* (without it, `CODEOWNERS` blocks nothing);
+   - *Require status checks to pass*, with the **`Translation budget`** check (it appears after the first pull request);
+   - *Block force pushes*.
+
+#### 6. Commit and push
+
+```bash
+git add -A
+git commit -m "Add the French translation kit"
+git push origin main
+```
+
+The first deploy translates the whole book (which counts against the free allowance), saves the translations to `translation-cache`, and publishes the site at `https://<owner>.github.io/<repo>/` with the French version at `.../<repo>/fr/`. Later deploys only translate new or changed text.
+
+### Day to day
+
+- **Writing**: open pull requests as usual. A *Translation estimate* comment says what will be sent to Google and what the month has used so far.
+- **Fixing a translation**: add an entry to `translations/fr.overrides.json`. The key is the English text as the pipeline sees it: links and code are replaced by `XPHX0XPHX`, `XPHX1XPHX`… markers. Copy the exact key from the cache (`fr.cache.json` on `translation-cache`) or from the build's error message:
+
+  ```json
+  {
+    "Install [Git]XPHX0XPHX on your system.": "Installez [Git]XPHX0XPHX sur votre système."
+  }
+  ```
+
+- **When the deploy fails**: a "Deploy is failing" issue opens with a link to the run. Usual causes: a sentence Google keeps mangling (pin it), or a key problem (see *Troubleshooting*). Nothing is published until both languages build, so `/fr/` never disappears from the live site.
+
+### Building locally
+
+```bash
+pip install pyyaml pytest
+mkdir -p .tcache
+git fetch origin translation-cache
+git show origin/translation-cache:fr.cache.json > .tcache/fr.cache.json
+
+myst build --html
+python3 scripts/build-french.py --cache .tcache/fr.cache.json
+python3 scripts/inject-language-switcher.py
+python3 -m pytest tests/
+```
+
+If the cache already covers every sentence, no key is needed. Otherwise, `export GOOGLE_TRANSLATE_API_KEY=...` before the French build, knowing those characters count against your allowance. Then open `_build/html/index.html` and `_build/html/fr/index.html`.
 
 ### Customization
 
-| What | Where | How |
-|------|-------|-----|
-| Language pair | `scripts/translation-config.yml` | Edit `source_lang` / `target_lang` (ISO 639-1 codes) |
-| Default landing language | `scripts/translation-config.yml` | Set `default_lang` to `source_lang` or `target_lang` |
-| Flag images | `scripts/language-switcher.js` | Replace `sourceFlagUri` / `targetFlagUri` (base64 data URIs). Left flag = source, right flag = target |
-| Widget position / size | `scripts/language-switcher.js` | `W`, `H`, `PAD_BOTTOM`, `PAD_RIGHT` constants |
-| Domain-specific term corrections | `scripts/translate-sources.py` | Add post-translation `.replace(...)` in `translate_text()` |
-
-#### Generating new flag data URIs
-
-The flags are inline base64 SVGs so they live in the JS and load with zero network requests. To replace one:
-
-```bash
-# From any SVG file:
-base64 -i my-flag.svg | pbcopy   # macOS
-# Then in language-switcher.js:
-#   var sourceFlagUri = 'data:image/svg+xml;base64,<paste>';
-```
+| What | Where |
+|------|-------|
+| Default language on first visit | `scripts/language-switcher.js`: change `\|\| 'fr'` to `\|\| 'en'` |
+| Flag images | `scripts/language-switcher.js`: `ukUri` / `qcUri` (base64 SVGs) |
+| Widget position and size | `scripts/language-switcher.js`: `W`, `H`, `PAD_BOTTOM`, `PAD_RIGHT` |
+| Folders copied as-is into the French build | `scripts/translate_sources.py`: `ASSET_DIRS` (default `images`, `figures`, `bibliography`) |
+| Monthly allowance used by the estimate | `scripts/estimate_translation.py`: `FREE_TIER_CHARACTERS` |
 
 ### Troubleshooting
 
-- **`/<target_lang>/` links go to `username.github.io/<target_lang>/` instead of `username.github.io/reponame/<target_lang>/`** — `BASE_URL` is not set in the workflow's top-level `env:`. The bundled `deploy.yml` sets it from `github.event.repository.name`; double-check it's there.
-- **Google Translate throttling on large books** — `translate-sources.py` sleeps 300 ms between calls. For very large projects, raise the `time.sleep(0.3)` values.
-- **Widget redirects to the wrong language on first load** — that's the auto-redirect to `default_lang`. Edit `scripts/translation-config.yml` and re-run the build.
-- **Flags look wrong for your direction** — remember that the LEFT flag in the widget is the source language (`/`) and the RIGHT flag is the target (`/<target_lang>/`). If you swapped `source_lang` and `target_lang`, also swap `sourceFlagUri` and `targetFlagUri` in `language-switcher.js`.
-- **`myst.yml` parse errors during translated build** — usually `abbreviations:` with no entries. `translate-sources.py` already drops empty abbreviations; if you've added other null/empty top-level keys, strip them in `create_translated_myst_yml()`.
+- **`GOOGLE_TRANSLATE_API_KEY is not set`**: the secret is missing, or the environment isn't named exactly `translation`.
+- **`Branch "…" is not allowed to deploy to translation`**: only `main` can read the key (step 5). That's intended; merge the branch first.
+- **A 403 error mentioning billing or a disabled API**: billing isn't linked to the project, or the Cloud Translation API isn't enabled (step 1).
+- **`couldn't find remote ref translation-cache`**: the cache branch doesn't exist (step 4).
+- **Links go to `<owner>.github.io/fr/` instead of `<owner>.github.io/<repo>/fr/`**: `BASE_URL` is wrong in `deploy.yml` (step 3).
+- **Pushing the cache fails**: the workflow needs `contents: write` and `issues: write`. If your organization restricts workflow permissions, allow them under *Settings → Actions → General → Workflow permissions*.
+- **Titles and contents of `:::{table}` tables stay in English**: known limitation ([#1](https://github.com/polymtl-reproducible-research/myst-translation-kit/issues/1)).
+
+### Updating the kit in an existing book
+
+Re-copy only the code, not your own files:
+
+```bash
+cp -R ../myst-translation-kit/template/scripts/. scripts/
+cp -R ../myst-translation-kit/template/tests/. tests/
+cp ../myst-translation-kit/template/.github/workflows/*.yml .github/workflows/
+```
+
+Don't re-copy `translations/fr.overrides.json` (your pinned translations) or `.github/CODEOWNERS`, and re-check `BASE_URL` in `deploy.yml`.
