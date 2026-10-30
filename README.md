@@ -75,7 +75,9 @@ Faites les étapes dans l'ordre : le premier push sur `main` déclenche un dépl
 - La première fois que vous configurez la facturation, Google propose généralement un essai gratuit (un crédit à utiliser dans un délai limité). Une carte de crédit est demandée pour vérifier votre identité ; rien n'est facturé pendant l'essai.
 - **Important :** à la fin de l'essai, Google suspend les services payants tant que vous n'avez pas activé un compte complet, et le déploiement se met à échouer avec une erreur de facturation. Activez le compte complet (bouton *Activer* ou *Passer à un compte complet* dans *Facturation*) dès que le livre est en ligne. Les 500 000 caractères gratuits par mois s'appliquent toujours ensuite.
 
-1. **Créer un projet** : ouvrez <https://console.cloud.google.com/projectcreate>, nommez-le (p. ex. `mon-livre-traduction`) et cliquez sur *Créer*. Si la console vous ouvre plutôt un projet existant, c'est normal : le menu des projets est le nom de projet en haut à gauche, à côté du logo Google Cloud. Utilisez un projet dédié, et vérifiez qu'il est bien sélectionné dans ce menu avant les étapes suivantes.
+1. **Créer un projet** : ouvrez <https://console.cloud.google.com/projectcreate>, nommez-le (p. ex. `mon-livre-traduction`) et cliquez sur *Créer*. Si la console vous ouvre plutôt un projet existant, c'est normal : le menu des projets est le nom de projet en haut à gauche, à côté du logo Google Cloud. Utilisez un projet dédié.
+
+   **Créer le projet ne vous y amène pas** : la console reste sur le projet précédent. Une fois le projet créé, cliquez sur *Sélectionner le projet* dans la notification, ou choisissez-le dans le menu des projets. Pendant toutes les étapes suivantes, vérifiez que l'URL contient `?project=<id-de-votre-nouveau-projet>` : sinon, la facturation, l'API et la clé atterriront dans le mauvais projet.
 2. **Facturation** : dans le menu *Facturation*, associez un compte de facturation au projet. L'API refuse toute requête sans facturation, même à l'intérieur du quota gratuit.
 3. **Activer l'API** : *API et services → Bibliothèque*, cherchez « Cloud Translation API », puis *Activer*.
 4. **Créer la clé** : *API et services → Identifiants → Créer des identifiants → Clé API*. Un formulaire s'ouvre :
@@ -283,7 +285,9 @@ Do these steps in order: the first push to `main` triggers a deploy, which will 
 - The first time you set up billing, Google usually offers a free trial (credit to use within a limited time). A credit card is required to verify your identity; nothing is charged during the trial.
 - **Important:** when the trial ends, Google pauses paid services until you activate a full account, and the deploy starts failing with a billing error. Activate the full account (the *Activate* or *Upgrade to full account* button in *Billing*) once the book is live. The 500,000 free characters per month still apply afterwards.
 
-1. **Create a project**: open <https://console.cloud.google.com/projectcreate>, name it (e.g. `my-book-translation`) and click *Create*. If the console drops you into an existing project instead, that's normal: the project picker is the project name at the top left, next to the Google Cloud logo. Use a dedicated project, and check it's selected in that picker before the next steps.
+1. **Create a project**: open <https://console.cloud.google.com/projectcreate>, name it (e.g. `my-book-translation`) and click *Create*. If the console drops you into an existing project instead, that's normal: the project picker is the project name at the top left, next to the Google Cloud logo. Use a dedicated project.
+
+   **Creating the project doesn't switch you to it**: the console stays on the previous project. Once it's created, click *Select project* in the notification, or choose it in the project picker. Throughout the next steps, check that the URL contains `?project=<your-new-project-id>`: otherwise billing, the API and the key will land in the wrong project.
 2. **Billing**: in the *Billing* menu, link a billing account to the project. The API refuses every request without billing, even inside the free allowance.
 3. **Enable the API**: *APIs & Services → Library*, search for "Cloud Translation API", then *Enable*.
 4. **Create the key**: *APIs & Services → Credentials → Create credentials → API key*. A form opens:
