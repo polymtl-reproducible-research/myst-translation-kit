@@ -68,6 +68,13 @@ Faites les étapes dans l'ordre : le premier push sur `main` déclenche un dépl
 
 #### 1. Obtenir une clé d'API Google Cloud Translation
 
+**Première fois sur Google Cloud ?** Quelques étapes uniques :
+
+- Connectez-vous avec un compte Google. Un compte institutionnel peut avoir Google Cloud désactivé ou restreint par son administrateur ; un compte Gmail personnel est le plus simple.
+- À la première visite de la console, acceptez les conditions d'utilisation et choisissez votre pays.
+- La première fois que vous configurez la facturation, Google propose généralement un essai gratuit (un crédit à utiliser dans un délai limité). Une carte de crédit est demandée pour vérifier votre identité ; rien n'est facturé pendant l'essai.
+- **Important :** à la fin de l'essai, Google suspend les services payants tant que vous n'avez pas activé un compte complet, et le déploiement se met à échouer avec une erreur de facturation. Activez le compte complet (bouton *Activer* ou *Passer à un compte complet* dans *Facturation*) dès que le livre est en ligne. Les 500 000 caractères gratuits par mois s'appliquent toujours ensuite.
+
 1. **Créer un projet** : ouvrez <https://console.cloud.google.com/projectcreate>, nommez-le (p. ex. `mon-livre-traduction`) et cliquez sur *Créer*. Si la console vous ouvre plutôt un projet existant, c'est normal : le menu des projets est le nom de projet en haut à gauche, à côté du logo Google Cloud. Utilisez un projet dédié, et vérifiez qu'il est bien sélectionné dans ce menu avant les étapes suivantes.
 2. **Facturation** : dans le menu *Facturation*, associez un compte de facturation au projet. L'API refuse toute requête sans facturation, même à l'intérieur du quota gratuit.
 3. **Activer l'API** : *API et services → Bibliothèque*, cherchez « Cloud Translation API », puis *Activer*.
@@ -187,7 +194,7 @@ Si le cache couvre déjà toutes les phrases, aucune clé n'est nécessaire. Sin
 
 - **`GOOGLE_TRANSLATE_API_KEY is not set`** : le secret manque, ou l'environnement ne s'appelle pas exactement `translation`.
 - **`Branch "…" is not allowed to deploy to translation`** : seul `main` peut lire la clé (étape 5). C'est voulu ; fusionnez d'abord la branche.
-- **Erreur 403 mentionnant la facturation ou une API désactivée** : la facturation n'est pas associée au projet, ou l'API Cloud Translation n'est pas activée (étape 1).
+- **Erreur 403 mentionnant la facturation ou une API désactivée** : la facturation n'est pas associée au projet, l'API Cloud Translation n'est pas activée (étape 1), ou l'essai gratuit est terminé sans que le compte complet ait été activé.
 - **`couldn't find remote ref translation-cache`** : la branche du cache n'existe pas (étape 4).
 - **Les liens mènent à `<propriétaire>.github.io/fr/` au lieu de `<propriétaire>.github.io/<dépôt>/fr/`** : `BASE_URL` est mal défini dans `deploy.yml` (étape 3).
 - **Le push du cache échoue** : le workflow a besoin de `contents: write` et `issues: write`. Si votre organisation limite les permissions des workflows, autorisez-les dans *Settings → Actions → General → Workflow permissions*.
@@ -264,6 +271,13 @@ template/
 Do these steps in order: the first push to `main` triggers a deploy, which will fail if the key or the cache branch don't exist yet.
 
 #### 1. Get a Google Cloud Translation API key
+
+**First time on Google Cloud?** A few one-off steps:
+
+- Sign in with a Google account. An institutional account may have Google Cloud disabled or restricted by its administrator; a personal Gmail account is the simplest.
+- On your first visit to the console, accept the terms of service and choose your country.
+- The first time you set up billing, Google usually offers a free trial (credit to use within a limited time). A credit card is required to verify your identity; nothing is charged during the trial.
+- **Important:** when the trial ends, Google pauses paid services until you activate a full account, and the deploy starts failing with a billing error. Activate the full account (the *Activate* or *Upgrade to full account* button in *Billing*) once the book is live. The 500,000 free characters per month still apply afterwards.
 
 1. **Create a project**: open <https://console.cloud.google.com/projectcreate>, name it (e.g. `my-book-translation`) and click *Create*. If the console drops you into an existing project instead, that's normal: the project picker is the project name at the top left, next to the Google Cloud logo. Use a dedicated project, and check it's selected in that picker before the next steps.
 2. **Billing**: in the *Billing* menu, link a billing account to the project. The API refuses every request without billing, even inside the free allowance.
@@ -384,7 +398,7 @@ If the cache already covers every sentence, no key is needed. Otherwise, `export
 
 - **`GOOGLE_TRANSLATE_API_KEY is not set`**: the secret is missing, or the environment isn't named exactly `translation`.
 - **`Branch "…" is not allowed to deploy to translation`**: only `main` can read the key (step 5). That's intended; merge the branch first.
-- **A 403 error mentioning billing or a disabled API**: billing isn't linked to the project, or the Cloud Translation API isn't enabled (step 1).
+- **A 403 error mentioning billing or a disabled API**: billing isn't linked to the project, the Cloud Translation API isn't enabled (step 1), or the free trial ended without the full account being activated.
 - **`couldn't find remote ref translation-cache`**: the cache branch doesn't exist (step 4).
 - **Links go to `<owner>.github.io/fr/` instead of `<owner>.github.io/<repo>/fr/`**: `BASE_URL` is wrong in `deploy.yml` (step 3).
 - **Pushing the cache fails**: the workflow needs `contents: write` and `issues: write`. If your organization restricts workflow permissions, allow them under *Settings → Actions → General → Workflow permissions*.
