@@ -68,7 +68,7 @@ Faites les étapes dans l'ordre : le premier push sur `main` déclenche un dépl
 
 #### 1. Obtenir une clé d'API Google Cloud Translation
 
-1. Allez sur la [console Google Cloud](https://console.cloud.google.com/) et créez un projet (p. ex. `mon-livre-traduction`).
+1. **Créer un projet** : ouvrez <https://console.cloud.google.com/projectcreate>, nommez-le (p. ex. `mon-livre-traduction`) et cliquez sur *Créer*. Si la console vous ouvre plutôt un projet existant, c'est normal : le menu des projets est le nom de projet en haut à gauche, à côté du logo Google Cloud. Utilisez un projet dédié, et vérifiez qu'il est bien sélectionné dans ce menu avant les étapes suivantes.
 2. **Facturation** : dans le menu *Facturation*, associez un compte de facturation au projet. L'API refuse toute requête sans facturation, même à l'intérieur du quota gratuit.
 3. **Activer l'API** : *API et services → Bibliothèque*, cherchez « Cloud Translation API », puis *Activer*.
 4. **Créer la clé** : *API et services → Identifiants → Créer des identifiants → Clé API*. Copiez-la.
@@ -265,7 +265,7 @@ Do these steps in order: the first push to `main` triggers a deploy, which will 
 
 #### 1. Get a Google Cloud Translation API key
 
-1. Go to the [Google Cloud console](https://console.cloud.google.com/) and create a project (e.g. `my-book-translation`).
+1. **Create a project**: open <https://console.cloud.google.com/projectcreate>, name it (e.g. `my-book-translation`) and click *Create*. If the console drops you into an existing project instead, that's normal: the project picker is the project name at the top left, next to the Google Cloud logo. Use a dedicated project, and check it's selected in that picker before the next steps.
 2. **Billing**: in the *Billing* menu, link a billing account to the project. The API refuses every request without billing, even inside the free allowance.
 3. **Enable the API**: *APIs & Services → Library*, search for "Cloud Translation API", then *Enable*.
 4. **Create the key**: *APIs & Services → Credentials → Create credentials → API key*. Copy it.
