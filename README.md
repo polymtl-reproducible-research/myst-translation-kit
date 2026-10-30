@@ -30,7 +30,7 @@ Pour l'architecture en détail, voir [`template/scripts/TRANSLATION.md`](templat
 
 ### Ce qu'il vous faut
 
-- Un livre MyST en anglais dans un dépôt GitHub, avec un `myst.yml` qui contient un `project.toc`.
+- Un livre MyST en anglais **déjà poussé sur GitHub**, avec un `myst.yml` qui contient un `project.toc` (`myst init --write-toc` le crée). Le dépôt doit être public pour GitHub Pages avec un compte gratuit.
 - Les droits d'administration sur ce dépôt.
 - Un compte Google Cloud **avec la facturation activée** (une carte de crédit est demandée). Les 500 000 premiers caractères par mois sont gratuits, ce qui couvre largement un livre de cours ; au-delà, c'est 20 $ US par million de caractères. Grâce au cache, seul le texte nouveau ou modifié est envoyé à Google.
 
@@ -195,7 +195,17 @@ EOF
 
 #### 4. Créer la branche du cache
 
-Le déploiement lit et met à jour `fr.cache.json` sur une branche séparée, `translation-cache`. Créez-la vide :
+Le déploiement lit et met à jour `fr.cache.json` sur une branche séparée, `translation-cache`.
+
+Vérifiez d'abord que votre livre est sur GitHub : dans le dossier du livre, `git remote -v` doit afficher une ligne `origin`. Si rien ne s'affiche, le livre n'existe que sur votre ordinateur ; créez le dépôt GitHub et poussez-le (avec [GitHub CLI](https://cli.github.com/)) :
+
+```bash
+gh repo create OWNER/REPO --public --source . --remote origin --push
+```
+
+Ce push ne contient que vos commits existants : les fichiers de la trousse ne sont pas encore commités, donc aucun workflow ne se lance.
+
+Créez ensuite la branche du cache, vide :
 
 ```bash
 git switch --orphan translation-cache
@@ -325,7 +335,7 @@ For the architecture in detail, see [`template/scripts/TRANSLATION.md`](template
 
 ### What you need
 
-- An English MyST book in a GitHub repository, with a `myst.yml` containing a `project.toc`.
+- An English MyST book **already pushed to GitHub**, with a `myst.yml` containing a `project.toc` (`myst init --write-toc` creates one). The repository must be public for GitHub Pages on a free account.
 - Admin rights on that repository.
 - A Google Cloud account **with billing enabled** (a credit card is required). The first 500,000 characters each month are free, which comfortably covers a course book; beyond that it's US$20 per million characters. Thanks to the cache, only new or changed text is ever sent to Google.
 
@@ -490,7 +500,17 @@ EOF
 
 #### 4. Create the cache branch
 
-The deploy reads and updates `fr.cache.json` on a separate branch, `translation-cache`. Create it empty:
+The deploy reads and updates `fr.cache.json` on a separate branch, `translation-cache`.
+
+First check that your book is on GitHub: in the book's folder, `git remote -v` should print an `origin` line. If it prints nothing, the book only exists on your computer; create the GitHub repository and push it (with the [GitHub CLI](https://cli.github.com/)):
+
+```bash
+gh repo create OWNER/REPO --public --source . --remote origin --push
+```
+
+That push only contains your existing commits: the kit's files aren't committed yet, so no workflow runs.
+
+Then create the cache branch, empty:
 
 ```bash
 git switch --orphan translation-cache
