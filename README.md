@@ -88,14 +88,17 @@ Faites les étapes dans l'ordre : le premier push sur `main` déclenche un dépl
    Cliquez sur *Créer*, puis copiez la clé affichée.
 5. **Alerte budgétaire** (recommandé) : *Facturation → Budgets et alertes*, créez un petit budget (p. ex. 5 $) avec alertes par courriel. Une alerte n'arrête pas les dépenses : elle vous prévient. Pour un plafond strict, réduisez le quota de caractères par jour de l'API dans *API et services → Cloud Translation API → Quotas*.
 
-Vérifiez que la clé fonctionne :
+**Où va la clé :** à un seul endroit, le secret GitHub de l'étape 5. Inutile de la sauvegarder ailleurs : la page *Identifiants* la réaffiche avec *Afficher la clé*. Ne la mettez jamais dans un fichier du dépôt (une clé commitée reste dans l'historique git même après suppression : considérez-la comme compromise et supprimez-la), ni dans une issue, une pull request ou un message, ni en clair sur une ligne de commande (elle resterait dans l'historique du shell).
+
+Vérifiez que la clé fonctionne. `read` la demande sans l'afficher ni l'enregistrer dans l'historique :
 
 ```bash
+read -rs GOOGLE_TRANSLATE_API_KEY && export GOOGLE_TRANSLATE_API_KEY   # collez la clé, puis Entrée
 curl -s "https://translation.googleapis.com/language/translate/v2" \
-  -d key="VOTRE_CLÉ" -d q="Hello world" -d source=en -d target=fr
+  -d key="$GOOGLE_TRANSLATE_API_KEY" -d q="Hello world" -d source=en -d target=fr
 ```
 
-La réponse doit contenir `"translatedText": "Bonjour le monde"`. Ne commitez jamais la clé : elle ira uniquement dans les secrets GitHub (étape 5).
+La réponse doit contenir `"translatedText": "Bonjour le monde"`. La variable disparaît à la fermeture du terminal.
 
 #### 2. Copier la trousse dans votre livre
 
@@ -298,14 +301,17 @@ Do these steps in order: the first push to `main` triggers a deploy, which will 
    Click *Create*, then copy the key it shows.
 5. **Budget alert** (recommended): *Billing → Budgets & alerts*, create a small budget (e.g. $5) with email alerts. An alert doesn't stop spending; it tells you. For a hard cap, lower the API's characters-per-day quota under *APIs & Services → Cloud Translation API → Quotas*.
 
-Check that the key works:
+**Where the key goes:** one place only, the GitHub secret in step 5. No need to save it anywhere else: the *Credentials* page shows it again with *Show key*. Never put it in a file in the repository (a committed key stays in git history even after it's deleted: treat it as leaked and delete the key), in an issue, pull request or message, or typed out on a command line (it would stay in your shell history).
+
+Check that the key works. `read` asks for it without displaying it or saving it to your history:
 
 ```bash
+read -rs GOOGLE_TRANSLATE_API_KEY && export GOOGLE_TRANSLATE_API_KEY   # paste the key, then Enter
 curl -s "https://translation.googleapis.com/language/translate/v2" \
-  -d key="YOUR_KEY" -d q="Hello world" -d source=en -d target=fr
+  -d key="$GOOGLE_TRANSLATE_API_KEY" -d q="Hello world" -d source=en -d target=fr
 ```
 
-The response should contain `"translatedText": "Bonjour le monde"`. Never commit the key: it only goes into GitHub's secrets (step 5).
+The response should contain `"translatedText": "Bonjour le monde"`. The variable goes away when you close the terminal.
 
 #### 2. Copy the kit into your book
 
