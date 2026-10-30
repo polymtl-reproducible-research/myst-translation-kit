@@ -78,9 +78,13 @@ Faites les étapes dans l'ordre : le premier push sur `main` déclenche un dépl
 1. **Créer un projet** : ouvrez <https://console.cloud.google.com/projectcreate>, nommez-le (p. ex. `mon-livre-traduction`) et cliquez sur *Créer*. Si la console vous ouvre plutôt un projet existant, c'est normal : le menu des projets est le nom de projet en haut à gauche, à côté du logo Google Cloud. Utilisez un projet dédié, et vérifiez qu'il est bien sélectionné dans ce menu avant les étapes suivantes.
 2. **Facturation** : dans le menu *Facturation*, associez un compte de facturation au projet. L'API refuse toute requête sans facturation, même à l'intérieur du quota gratuit.
 3. **Activer l'API** : *API et services → Bibliothèque*, cherchez « Cloud Translation API », puis *Activer*.
-4. **Créer la clé** : *API et services → Identifiants → Créer des identifiants → Clé API*. Copiez-la.
-5. **Restreindre la clé** (fortement recommandé) : modifiez la clé, puis sous *Restrictions d'API* choisissez *Restreindre la clé* et cochez seulement « Cloud Translation API ». Une clé qui fuit ne pourra alors servir qu'à traduire.
-6. **Alerte budgétaire** (recommandé) : *Facturation → Budgets et alertes*, créez un petit budget (p. ex. 5 $) avec alertes par courriel. Une alerte n'arrête pas les dépenses : elle vous prévient. Pour un plafond strict, réduisez le quota de caractères par jour de l'API dans *API et services → Cloud Translation API → Quotas*.
+4. **Créer la clé** : *API et services → Identifiants → Créer des identifiants → Clé API*. Un formulaire s'ouvre :
+   - **Nom** : quelque chose de reconnaissable, p. ex. `mon-livre-traduction`.
+   - **Restrictions d'API** : sélectionnez seulement « Cloud Translation API ». Une clé qui fuit ne pourra alors servir qu'à traduire. (Si elle n'apparaît pas dans la liste, l'API n'est pas activée dans ce projet : refaites l'étape 3.)
+   - **Restrictions d'application** : laissez *Aucune*. La clé est utilisée par les serveurs de GitHub Actions, dont les adresses IP changent à chaque exécution, et une restriction par site web ne s'applique qu'aux requêtes faites depuis un navigateur.
+
+   Cliquez sur *Créer*, puis copiez la clé affichée.
+5. **Alerte budgétaire** (recommandé) : *Facturation → Budgets et alertes*, créez un petit budget (p. ex. 5 $) avec alertes par courriel. Une alerte n'arrête pas les dépenses : elle vous prévient. Pour un plafond strict, réduisez le quota de caractères par jour de l'API dans *API et services → Cloud Translation API → Quotas*.
 
 Vérifiez que la clé fonctionne :
 
@@ -282,9 +286,13 @@ Do these steps in order: the first push to `main` triggers a deploy, which will 
 1. **Create a project**: open <https://console.cloud.google.com/projectcreate>, name it (e.g. `my-book-translation`) and click *Create*. If the console drops you into an existing project instead, that's normal: the project picker is the project name at the top left, next to the Google Cloud logo. Use a dedicated project, and check it's selected in that picker before the next steps.
 2. **Billing**: in the *Billing* menu, link a billing account to the project. The API refuses every request without billing, even inside the free allowance.
 3. **Enable the API**: *APIs & Services → Library*, search for "Cloud Translation API", then *Enable*.
-4. **Create the key**: *APIs & Services → Credentials → Create credentials → API key*. Copy it.
-5. **Restrict the key** (strongly recommended): edit the key, and under *API restrictions* choose *Restrict key* and tick only "Cloud Translation API". A leaked key can then only be used to translate.
-6. **Budget alert** (recommended): *Billing → Budgets & alerts*, create a small budget (e.g. $5) with email alerts. An alert doesn't stop spending; it tells you. For a hard cap, lower the API's characters-per-day quota under *APIs & Services → Cloud Translation API → Quotas*.
+4. **Create the key**: *APIs & Services → Credentials → Create credentials → API key*. A form opens:
+   - **Name**: something recognizable, e.g. `my-book-translation`.
+   - **API restrictions**: select only "Cloud Translation API". A leaked key can then only be used to translate. (If it isn't in the list, the API isn't enabled in this project: redo step 3.)
+   - **Application restrictions**: leave *None*. The key is used by GitHub Actions servers, whose IP addresses change on every run, and a website restriction only applies to requests made from a browser.
+
+   Click *Create*, then copy the key it shows.
+5. **Budget alert** (recommended): *Billing → Budgets & alerts*, create a small budget (e.g. $5) with email alerts. An alert doesn't stop spending; it tells you. For a hard cap, lower the API's characters-per-day quota under *APIs & Services → Cloud Translation API → Quotas*.
 
 Check that the key works:
 
