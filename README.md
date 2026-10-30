@@ -86,7 +86,11 @@ Faites les étapes dans l'ordre : le premier push sur `main` déclenche un dépl
    - **Restrictions d'application** : laissez *Aucune*. La clé est utilisée par les serveurs de GitHub Actions, dont les adresses IP changent à chaque exécution, et une restriction par site web ne s'applique qu'aux requêtes faites depuis un navigateur.
 
    Cliquez sur *Créer*. Inutile de copier la clé maintenant : la page *Identifiants* la réaffiche à tout moment avec *Afficher la clé*, et chaque étape qui en a besoin vous dira de la copier juste avant de la coller.
-5. **Alerte budgétaire** (recommandé) : *Facturation → Budgets et alertes*, créez un petit budget (p. ex. 5 $) avec alertes par courriel. Une alerte n'arrête pas les dépenses : elle vous prévient. Pour un plafond strict, réduisez le quota de caractères par jour de l'API dans *API et services → Cloud Translation API → Quotas*.
+5. **Alerte budgétaire** (recommandé) : les budgets appartiennent au compte de facturation, pas au projet, donc ils ne sont pas dans *API et services*. Ouvrez <https://console.cloud.google.com/billing/budgets> (ou tapez « Budgets » dans la barre de recherche de la console), choisissez votre compte de facturation, puis *Créer un budget* :
+   - **Champ d'application → Projets** : seulement votre nouveau projet, pour ne pas compter les dépenses de vos autres projets ;
+   - **Montant** : petit, p. ex. 5 $ ; gardez les alertes par courriel par défaut.
+
+   Une alerte n'arrête pas les dépenses : elle vous prévient. Pour un plafond strict, réduisez plutôt le quota de caractères par jour de l'API : <https://console.cloud.google.com/apis/api/translate.googleapis.com/quotas>.
 
 **Où va la clé :** à un seul endroit, le secret GitHub de l'étape 5. Ne la sauvegardez nulle part ailleurs. Ne la mettez jamais dans un fichier du dépôt (une clé commitée reste dans l'historique git même après suppression : considérez-la comme compromise et supprimez-la), ni dans une issue, une pull request ou un message, ni en clair sur une ligne de commande (elle resterait dans l'historique du shell).
 
@@ -299,7 +303,11 @@ Do these steps in order: the first push to `main` triggers a deploy, which will 
    - **Application restrictions**: leave *None*. The key is used by GitHub Actions servers, whose IP addresses change on every run, and a website restriction only applies to requests made from a browser.
 
    Click *Create*. No need to copy the key now: the *Credentials* page shows it again any time with *Show key*, and each step that needs it will tell you to copy it right before you paste it.
-5. **Budget alert** (recommended): *Billing → Budgets & alerts*, create a small budget (e.g. $5) with email alerts. An alert doesn't stop spending; it tells you. For a hard cap, lower the API's characters-per-day quota under *APIs & Services → Cloud Translation API → Quotas*.
+5. **Budget alert** (recommended): budgets belong to the billing account, not the project, so they aren't under *APIs & Services*. Open <https://console.cloud.google.com/billing/budgets> (or type "Budgets" in the console's search bar), pick your billing account, then *Create budget*:
+   - **Scope → Projects**: only your new project, so spending in your other projects isn't counted;
+   - **Amount**: something small, e.g. $5; keep the default email alerts.
+
+   An alert doesn't stop spending; it tells you. For a hard cap, lower the API's characters-per-day quota instead: <https://console.cloud.google.com/apis/api/translate.googleapis.com/quotas>.
 
 **Where the key goes:** one place only, the GitHub secret in step 5. Don't save it anywhere else. Never put it in a file in the repository (a committed key stays in git history even after it's deleted: treat it as leaked and delete the key), in an issue, pull request or message, or typed out on a command line (it would stay in your shell history).
 
