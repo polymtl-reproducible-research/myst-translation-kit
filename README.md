@@ -157,11 +157,23 @@ La console Google Cloud est immense : chaque étape ci-dessous donne donc un lie
 
 #### 2. Copier la trousse dans votre livre
 
+Clonez la trousse **à côté** de votre livre, dans le même dossier parent, pour que les deux soient côte à côte :
+
+```
+projets/
+├── mon-livre/               # le dépôt de votre livre
+└── myst-translation-kit/    # la trousse
+```
+
+Depuis ce dossier parent (`projets/` ci-dessus), lancez :
+
 ```bash
 git clone https://github.com/polymtl-reproducible-research/myst-translation-kit.git
-cd mon-livre
+cd mon-livre                 # le dossier de votre livre
 cp -R ../myst-translation-kit/template/. .
 ```
+
+Le `.` final compte : il copie le contenu du modèle, y compris le dossier caché `.github/`, à la racine de votre livre.
 
 Attention : cela remplace `.github/workflows/deploy.yml`, `.github/workflows/tests.yml` et `.github/CODEOWNERS` s'ils existent déjà. Si vous aviez votre propre workflow de déploiement, fusionnez-le avec celui de la trousse plutôt que de l'écraser.
 
@@ -438,11 +450,23 @@ The Google Cloud console is huge, so each step below gives a direct link and say
 
 #### 2. Copy the kit into your book
 
+Clone the kit **next to** your book, in the same parent folder, so the two sit side by side:
+
+```
+projects/
+├── my-book/                 # your book's repository
+└── myst-translation-kit/    # the kit
+```
+
+From that parent folder (`projects/` above), run:
+
 ```bash
 git clone https://github.com/polymtl-reproducible-research/myst-translation-kit.git
-cd my-book
+cd my-book                   # your book's folder
 cp -R ../myst-translation-kit/template/. .
 ```
+
+The `.` at the end matters: it copies the template's contents, including the hidden `.github/` folder, into the root of your book.
 
 Careful: this replaces `.github/workflows/deploy.yml`, `.github/workflows/tests.yml` and `.github/CODEOWNERS` if they already exist. If you had your own deploy workflow, merge it with the kit's rather than overwriting it.
 
