@@ -227,7 +227,7 @@ Dans les liens ci-dessous, remplacez `OWNER/REPO` par votre dépôt (p. ex. `jea
 2. **La clé**
    - Ouvrez `https://github.com/OWNER/REPO/settings/environments/new`.
    - *Name* : exactement **`translation`**. Cliquez sur **Configure environment** ; vous arrivez sur la page de réglages de l'environnement.
-   - *Deployment branches and tags* : ouvrez la liste (elle indique *No restriction*) et choisissez **Selected branches and tags**. Cliquez sur **Add deployment branch or tag rule**, tapez `main`, puis **Add rule**. Seul du code fusionné pourra lire la clé.
+   - *Deployment branches and tags* : ouvrez la liste (elle indique *No restriction*) et choisissez **Selected branches and tags**. Cliquez sur **Add deployment branch or tag rule**. Dans la fenêtre, réglez *Ref type* sur **Branch**, tapez `main` dans *Name pattern*, puis cliquez sur **Add rule**. Seul du code fusionné pourra lire la clé.
    - *Environment secrets*, plus bas sur la même page : cliquez sur **Add environment secret**. *Name* : **`GOOGLE_TRANSLATE_API_KEY`**. Pour la *Value*, ouvrez `https://console.cloud.google.com/apis/credentials?project=YOUR_PROJECT_ID` dans un autre onglet, cliquez sur **Afficher la clé** dans la ligne de votre clé, copiez-la, revenez et collez-la aussitôt dans *Value*. Cliquez sur **Add secret**.
 
 #### 6. Commit et push
@@ -532,7 +532,7 @@ In the links below, replace `OWNER/REPO` with your repository (e.g. `jane/my-boo
 2. **The key**
    - Open `https://github.com/OWNER/REPO/settings/environments/new`.
    - *Name*: exactly **`translation`**. Click **Configure environment**; you land on the environment's settings page.
-   - *Deployment branches and tags*: open the dropdown (it says *No restriction*) and choose **Selected branches and tags**. Click **Add deployment branch or tag rule**, type `main`, and click **Add rule**. Only merged code can then read the key.
+   - *Deployment branches and tags*: open the dropdown (it says *No restriction*) and choose **Selected branches and tags**. Click **Add deployment branch or tag rule**. In the dialog, set *Ref type* to **Branch**, type `main` in *Name pattern*, and click **Add rule**. Only merged code can then read the key.
    - *Environment secrets*, further down the same page: click **Add environment secret**. *Name*: **`GOOGLE_TRANSLATE_API_KEY`**. For the *Value*, open `https://console.cloud.google.com/apis/credentials?project=YOUR_PROJECT_ID` in another tab, click **Show key** in your key's row, copy it, come back and paste it straight into *Value*. Click **Add secret**.
 
 #### 6. Commit and push
