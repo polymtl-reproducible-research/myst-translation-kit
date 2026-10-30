@@ -313,6 +313,10 @@ cp ../myst-translation-kit/template/.github/workflows/*.yml .github/workflows/
 
 Ne recopiez pas `translations/fr.overrides.json` (vos traductions épinglées) ni `.github/CODEOWNERS`, et revérifiez `BASE_URL` dans `deploy.yml`.
 
+### Licence
+
+[MIT](LICENSE). Vous pouvez utiliser, modifier et redistribuer la trousse, y compris dans vos propres gabarits, en conservant l'avis de licence.
+
 ---
 
 ## English
@@ -617,3 +621,7 @@ cp ../myst-translation-kit/template/.github/workflows/*.yml .github/workflows/
 ```
 
 Don't re-copy `translations/fr.overrides.json` (your pinned translations) or `.github/CODEOWNERS`, and re-check `BASE_URL` in `deploy.yml`.
+
+### License
+
+[MIT](LICENSE). You may use, modify and redistribute the kit, including in your own templates, as long as the license notice is kept.
